@@ -102,6 +102,18 @@ a{text-decoration:none}
 /* ── Footer ── */
 .footer{background:#1a1a2e;color:#6b7280;text-align:center;padding:18px;font-size:12px}
 
+/* ── Login Gate ── */
+.login-gate{position:fixed;inset:0;background:linear-gradient(135deg,#0f0f1e,#1a1a2e);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:#fff;border-radius:18px;padding:44px 48px;max-width:400px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.4);text-align:center}
+.login-icon{font-size:48px;margin-bottom:14px}
+.login-title{font-size:22px;font-weight:800;color:#1a1a2e;margin-bottom:6px}
+.login-sub{font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:24px}
+.login-input{width:100%;padding:12px 16px;border:2px solid #e5e7eb;border-radius:10px;font-size:18px;font-family:inherit;outline:none;text-align:center;letter-spacing:6px;transition:.2s}
+.login-input:focus{border-color:#CC0000}
+.login-btn{width:100%;padding:13px;background:#CC0000;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:14px;transition:.2s}
+.login-btn:hover{background:#a80000}
+.login-err{color:#CC0000;font-size:13px;margin-top:10px;min-height:18px}
+
 @media(max-width:700px){
   .header{padding:14px 18px}.stats-bar{padding:0 18px}.main{padding:20px 18px}
   .modal-body{grid-template-columns:1fr}
@@ -110,6 +122,18 @@ a{text-decoration:none}
 </style>
 </head>
 <body>
+
+<!-- Login Gate -->
+<div class="login-gate" id="loginGate">
+  <div class="login-box">
+    <div class="login-icon">🔐</div>
+    <div class="login-title">考官专用页面</div>
+    <div class="login-sub">此页面包含所有候选人评估信息，<br>请输入考官密码后访问。</div>
+    <input class="login-input" id="loginPw" type="password" placeholder="••••••••" maxlength="20">
+    <button class="login-btn" onclick="doLogin()">进入 →</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
 
 <!-- Header -->
 <header class="header">
@@ -173,6 +197,23 @@ a{text-decoration:none}
 <footer class="footer">联想集团海外业务事业部 · 数字化转型实习岗候选人评估系统 &copy; 2025</footer>
 
 <script>
+// ── Auth Gate ──
+const GATE_PW = 'Lenovo@2025';
+function doLogin(){
+  const v = document.getElementById('loginPw').value;
+  if(v === GATE_PW){
+    sessionStorage.setItem('hr_auth','1');
+    document.getElementById('loginGate').style.display='none';
+  } else {
+    document.getElementById('loginErr').textContent='密码错误，请重试';
+    document.getElementById('loginPw').value='';
+    document.getElementById('loginPw').focus();
+  }
+}
+document.getElementById('loginPw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+// Auto-pass if already authenticated this session
+if(sessionStorage.getItem('hr_auth')==='1') document.getElementById('loginGate').style.display='none';
+
 const COLORS = ['#E53935','#1E88E5','#43A047','#8E24AA','#F4511E','#00897B','#3949AB','#D81B60'];
 const DIM_LABELS = ['AI技术能力','产品思维','数字化洞察','国际视野','落地经验','业务分析'];
 const DIM_KEYS = ['ai','product','digital','international','delivery','analysis'];
