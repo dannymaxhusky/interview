@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>联想海外业务 · 数字化转型实习 | 候选人评估系统</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#F0F2F5;color:#1a1a2e;min-height:100vh}
+a{text-decoration:none}
+
+/* ── Header ── */
+.header{background:linear-gradient(135deg,#0f0f1e 0%,#1a1a2e 60%,#16213e 100%);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.4)}
+.hd-left{display:flex;align-items:center;gap:14px}
+.lenovo-badge{width:46px;height:46px;background:#CC0000;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;letter-spacing:-1px}
+.hd-text .co{font-size:20px;font-weight:700;color:#fff;letter-spacing:1px}
+.hd-text .sub{font-size:12px;color:#9ca3af;margin-top:2px}
+.hd-nav{display:flex;gap:10px}
+.btn{padding:9px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+.btn-primary{background:#CC0000;color:#fff;border:none}
+.btn-primary:hover{background:#a80000}
+.btn-ghost{background:transparent;color:#d1d5db;border:1px solid #4b5563}
+.btn-ghost:hover{border-color:#CC0000;color:#fff}
+
+/* ── Stats Bar ── */
+.stats-bar{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 40px;display:flex;gap:0}
+.stat{flex:1;text-align:center;padding:16px 0;border-right:1px solid #f3f4f6}
+.stat:last-child{border-right:none}
+.stat-n{font-size:26px;font-weight:800;color:#CC0000}
+.stat-l{font-size:11px;color:#6b7280;margin-top:2px}
+
+/* ── Main ── */
+.main{max-width:1360px;margin:0 auto;padding:32px 40px}
+.sec-title{font-size:18px;font-weight:700;color:#1a1a2e;border-left:4px solid #CC0000;padding-left:12px;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.sec-title span{font-size:12px;font-weight:400;color:#9ca3af;margin-left:4px}
+
+/* ── Candidate Grid ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;margin-bottom:50px}
+.card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,.06);cursor:pointer;transition:.25s;border:2px solid transparent;position:relative}
+.card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.12);border-color:#CC0000}
+
+.rank-badge{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.rank-1{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.rank-2{background:linear-gradient(135deg,#9ca3af,#6b7280)}
+.rank-3{background:linear-gradient(135deg,#cd7c2f,#b45309)}
+.rank-other{background:#e5e7eb;color:#6b7280}
+
+.card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0}
+.cinfo{flex:1}
+.cname{font-size:17px;font-weight:700}
+.cschool{font-size:12px;color:#6b7280;margin-top:3px}
+.cdeg{font-size:11px;color:#9ca3af;margin-top:2px}
+.cscore{text-align:center;flex-shrink:0;padding-right:22px}
+.score-ring{width:46px;height:46px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:#fff;line-height:1.1}
+.score-ring small{font-size:9px;font-weight:400}
+
+.chart-wrap{height:155px;margin:8px -4px}
+.card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tag{font-size:11px;padding:3px 9px;border-radius:10px;background:#f3f4f6;color:#4b5563}
+.tag-red{background:#fff0f0;color:#CC0000}
+
+/* ── Modal ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.overlay.on{display:flex}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:820px;max-height:92vh;overflow-y:auto;padding:32px}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
+.modal-name{font-size:24px;font-weight:800}
+.modal-school{font-size:13px;color:#6b7280;margin-top:4px}
+.close-btn{width:34px;height:34px;border-radius:50%;border:none;background:#f3f4f6;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.close-btn:hover{background:#fee2e2;color:#CC0000}
+.modal-body{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.modal-chart{height:280px}
+.dim-title{font-size:13px;font-weight:600;color:#CC0000;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.highlight-list{list-style:none}
+.highlight-list li{font-size:13px;color:#374151;padding:5px 0;border-bottom:1px solid #f9fafb;line-height:1.5}
+.highlight-list li::before{content:"▸ ";color:#CC0000}
+.score-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.smi{background:#f9fafb;border-radius:8px;padding:9px 12px}
+.smi-d{font-size:10px;color:#9ca3af;margin-bottom:3px}
+.smi-v{font-size:20px;font-weight:800;color:#1a1a2e}
+.smi-bar{height:4px;background:#e5e7eb;border-radius:2px;margin-top:5px}
+.smi-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#CC0000,#f87171)}
+.eval-box{margin-top:20px;background:#fafafa;border-radius:10px;padding:14px 16px;font-size:13px;color:#4b5563;line-height:1.8;border-left:3px solid #CC0000}
+
+/* ── Topics ── */
+.topics-wrap{margin-bottom:50px}
+.topic-card{background:#fff;border-radius:12px;margin-bottom:12px;box-shadow:0 1px 5px rgba(0,0,0,.05);border-left:4px solid #CC0000;overflow:hidden}
+.topic-head{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;user-select:none}
+.topic-num{width:34px;height:34px;border-radius:50%;background:#CC0000;color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topic-ttl{font-size:15px;font-weight:600;flex:1}
+.topic-meta{display:flex;gap:6px;flex-shrink:0}
+.topic-arrow{color:#CC0000;font-size:18px;transition:.2s;flex-shrink:0}
+.topic-body{display:none;padding:0 22px 20px 70px;border-top:1px solid #f3f4f6}
+.topic-body.open{display:block}
+.topic-desc{font-size:14px;color:#4b5563;line-height:1.8;margin-bottom:12px;margin-top:14px}
+.topic-pts{list-style:none}
+.topic-pts li{font-size:13px;color:#6b7280;padding:4px 0 4px 14px;position:relative;line-height:1.6}
+.topic-pts li::before{content:"·";color:#CC0000;position:absolute;left:0;font-size:18px;line-height:1.2}
+
+/* ── Footer ── */
+.footer{background:#1a1a2e;color:#6b7280;text-align:center;padding:18px;font-size:12px}
+
+@media(max-width:700px){
+  .header{padding:14px 18px}.stats-bar{padding:0 18px}.main{padding:20px 18px}
+  .modal-body{grid-template-columns:1fr}
+  .hd-text .sub{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="hd-left">
+    <div class="lenovo-badge">Le</div>
+    <div class="hd-text">
+      <div class="co">联想集团 · 海外业务事业部</div>
+      <div class="sub">数字化转型实习岗 · 候选人评估系统 2025</div>
+    </div>
+  </div>
+  <nav class="hd-nav">
+    <a href="exam.html" class="btn btn-primary">📝 进入考试</a>
+    <a href="results.html" class="btn btn-ghost">📊 考官后台</a>
+  </nav>
+</header>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-n">8</div><div class="stat-l">候选人总数</div></div>
+  <div class="stat"><div class="stat-n">78.6</div><div class="stat-l">平均综合评分</div></div>
+  <div class="stat"><div class="stat-n">6</div><div class="stat-l">评估维度</div></div>
+  <div class="stat"><div class="stat-n">10</div><div class="stat-l">在线考题</div></div>
+  <div class="stat"><div class="stat-n">5</div><div class="stat-l">分组讨论议题</div></div>
+  <div class="stat"><div class="stat-n">3</div><div class="stat-l">海外顶尖院校</div></div>
+</div>
+
+<div class="main">
+  <div class="sec-title">候选人多维能力评估 <span>点击卡片查看详情</span></div>
+  <div class="grid" id="grid"></div>
+
+  <div class="sec-title">分组讨论议题 <span>5个讨论主题 · 联想业务 / 数字化转型 / 金融科技</span></div>
+  <div class="topics-wrap" id="topics"></div>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-name" id="mName"></div>
+        <div class="modal-school" id="mSchool"></div>
+      </div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="dim-title">能力雷达图</div>
+        <div class="modal-chart"><canvas id="mChart"></canvas></div>
+      </div>
+      <div>
+        <div class="dim-title">核心亮点</div>
+        <ul class="highlight-list" id="mHl"></ul>
+        <div class="dim-title" style="margin-top:16px">各维度评分</div>
+        <div class="score-mini-grid" id="mSc"></div>
+      </div>
+    </div>
+    <div class="eval-box" id="mEval"></div>
+  </div>
+</div>
+
+<footer class="footer">联想集团海外业务事业部 · 数字化转型实习岗候选人评估系统 &copy; 2025</footer>
+
+<script>
+const COLORS = ['#E53935','#1E88E5','#43A047','#8E24AA','#F4511E','#00897B','#3949AB','#D81B60'];
+const DIM_LABELS = ['AI技术能力','产品思维','数字化洞察','国际视野','落地经验','业务分析'];
+const DIM_KEYS = ['ai','product','digital','international','delivery','analysis'];
+
+const candidates = [
+  {
+    name:'于泽龙', school:'东南大学', degree:'硕士 · 智能设计与先进建造（研二在读）',
+    avatar:'泽', tags:['AI产品经理','Agent平台','快手大厂','雅思6.5'],
+    highlights:[
+      '快手AIDP平台 AI产品经理实习（2025.11—2026.03）',
+      '主导20+角色用户深度访谈，完成8类核心平台需求',
+      '工具调用成功率65%→95%，用户满意度提升5.2%',
+      '智海星河 AI Agent 0→1 MVP 版本搭建（售前购Agent）',
+      'AIGC内容账号独立运营，累积1,400+粉丝，2.3万+赞藏',
+      '英语：雅思6.5 / 六级550+'
+    ],
+    scores:{ai:82,product:88,digital:72,international:58,delivery:85,analysis:80},
+    eval:'产品思维成熟，大厂AI产品落地经验完整，用户调研和需求分析能力突出。快手实习成果可量化，工程落地能力强。国际化视野相对有限，建议在海外业务场景面试中重点考察跨文化适应能力。'
+  },
+  {
+    name:'张卫凡', school:'西交利物浦大学 / UCL（在读）', degree:'本科·信息与计算科学 | UCL计算机科学硕士',
+    avatar:'凡', tags:['RAG/NL2SQL','美团实习','500万项目交付','UCL QS9'],
+    highlights:[
+      '美团 AI 产品实习：RAG 智能问答 Agent 从0到1设计落地',
+      '宝信软件 AI 产品实习：NL2SQL 数据分析效率提升50%+',
+      'AI视觉安全管控系统：结算500万，厂区事故率降低60%+',
+      '奖学金项目：基于机器学习的疟原虫分类（准确率90%+）',
+      '技能：Python/Java/SQL、Dify/FastAPI、Figma/Axure',
+      '英语：雅思6.5，中外合办背景，UCL名校加持'
+    ],
+    scores:{ai:90,product:82,digital:80,international:72,delivery:90,analysis:82},
+    eval:'技术与业务双驱动，项目交付能力是8人中最强之一。宝信500万项目结算经历体现了工程化落地实力。UCL计算机科学背景为技术理解深度提供背书，适合需要技术判断力的数字化转型角色。'
+  },
+  {
+    name:'张晓雨', school:'东南大学', degree:'硕士 · 数学学院大模型方向（研一在读）',
+    avatar:'雨', tags:['数学建模一等奖','携程策略产品','腾讯定制班','Vibe Coding'],
+    highlights:[
+      '携程集团策略产品实习（内容分发策略&治理，2025.11—2026.01）',
+      'C站Push自动化闭环：日发量220w push，首开提升5,400',
+      '腾讯AI产品经理训练营（CSIG BG定制班，2026.01—2026.04）',
+      '电网大模型：Qwen2.5-32B微调，稽查工单智能质检',
+      'Research Radar学术追踪助手（Vibe Coding独立开发）',
+      '英语：CET6 604；东南大学郑格如奖学金一等奖（全校仅24人）'
+    ],
+    scores:{ai:80,product:78,digital:72,international:58,delivery:75,analysis:88},
+    eval:'数学背景扎实，定量分析和建模能力是候选人中最强之一。腾讯BG定制班培训体现强学习能力。策略产品实习展示了数据驱动的产品思维。国际化经历相对欠缺，需在面试中评估英语沟通能力。'
+  },
+  {
+    name:'彭梓坚', school:'伦敦玛丽女王大学（QS 110）', degree:'理学硕士 · 机器人与人工智能（在读）',
+    avatar:'坚', tags:['英国留学','图灵研究所','数字孪生','No-code平台'],
+    highlights:[
+      'Project Bluebird：艾伦·图灵研究所数字孪生空管智能体',
+      '高校社团招新智能匹配SaaS平台（0→1完整闭环，三端权限）',
+      '上海优必杰AI讲师：单课时项目交付率提升30%',
+      '专业：机器人与AI，艾伦·图灵研究所合作项目背景',
+      '技能：Cursor/Gemini/Perplexity/No-code/Prompt工程/Python',
+      '英语：雅思6.0，CET-6，全球化视野突出'
+    ],
+    scores:{ai:80,product:82,digital:80,international:85,delivery:80,analysis:72},
+    eval:'国际化视野是候选人中的显著亮点，图灵研究所项目背景独特。数字孪生和AI产品全链路经验与联想海外数字化转型高度契合。英语工作能力强，适合跨文化团队合作。'
+  },
+  {
+    name:'杨晓文', school:'复旦大学', degree:'硕士 · 战略传播（A+学科）| 中央财经大学金融科技本科',
+    avatar:'文', tags:['金融科技背景','小红书AI产品','全栈开发','商业化运营'],
+    highlights:[
+      '小红书 AI 产品经理（商家智能客服，2026.04—06）',
+      '小红书 AI 产品运营（平台智能客服，2025.09—2026.04）',
+      '异常治理成果：方案包为空异常发生下降90%（190→17/日）',
+      '独立开发个人AI Agent（类Claude Code）+ 记忆工具「敲脑壳」',
+      '金融科技+战略传播双背景，商业化变现能力突出',
+      '英语：六级592；Claude Code源码深度研读并产出技术文档'
+    ],
+    scores:{ai:72,product:88,digital:82,international:65,delivery:82,analysis:90},
+    eval:'金融科技+传播学双背景独特，业务分析和商业化思维极强，是候选人中最高之一。小红书大厂AI产品经理经验实战性强，量化成果显著。适合数字化转型中的商业策略和业务落地角色。'
+  },
+  {
+    name:'毛雅婕', school:'南安普顿大学 / UCL（在读）', degree:'计算机科学本科(2:1) | UCL新兴数字技术硕士',
+    avatar:'婕', tags:['英语工作语言','金融风控AI','量化投资','全英文教育'],
+    highlights:[
+      'cointr 产品经理实习（风控合规方向，2025.06—09）',
+      '反欺诈AI平台：单案处理时间缩短40%，用户流失下降15%',
+      'GNN团伙行为识别：AUC 0.93，欺诈识别召回率提升至87%',
+      '多模态LLM股票收益预测（UCL在研，PPO强化学习框架）',
+      '线上智能笔记平台：RAG系统，用户正确率85%，效率提升80%+',
+      'UCL核心课程：区块链技术、数字金融、机器学习在金融中的应用'
+    ],
+    scores:{ai:92,product:80,digital:90,international:92,delivery:88,analysis:92},
+    eval:'综合评分第一。全英文本硕教育背景，英语可用做工作语言，最符合联想海外业务国际化要求。技术能力与金融数字化洞察均处8人最高水平，量化金融+AI产品经验与联想海外B2B数字化高度匹配。'
+  },
+  {
+    name:'王天启', school:'新加坡南洋理工大学（NTU）', degree:'硕士 · 生物医学工程 | 河南工业大学物联网工程本科',
+    avatar:'启', tags:['Zalora电商AI','美团旅游AI','新加坡NTU','东南亚视野'],
+    highlights:[
+      'Zalora电商 AI产品经理实习（2025.08—2026.01）',
+      'AI外呼系统：订单流失率12.9%→8.6%，人力成本节省20%',
+      '美团旅游度假 AI产品经理实习（2025.03—2025.08）',
+      'AI路线生成：采纳率30%→50%+，上线200+条结构化路线',
+      '台湾中原大学交换：物联网平台获全国设计竞赛一等奖',
+      '英伟达AI训练营结业认证；新加坡+台湾+东南亚多地经历'
+    ],
+    scores:{ai:82,product:90,digital:82,international:85,delivery:90,analysis:82},
+    eval:'综合评分第二。AI产品经理实习经验最为丰富（Zalora+美团两段），均有可量化的真实业务成果。新加坡NTU、台湾交换和东南亚电商背景直接契合联想海外业务需求，跨文化协作能力突出。'
+  },
+  {
+    name:'王瑞', school:'南京航空航天大学', degree:'软件工程硕士在读（本科同校）',
+    avatar:'瑞', tags:['软件工程','机器学习','嵌入式开发','学术研究'],
+    highlights:[
+      '经纬恒润嵌入式软件开发实习（车载控制器，2024年3个月）',
+      '基于特征分布的数据采样研究（归一化流+强化学习）',
+      '短视频多模态情感分析（LSTM/RNN文本情感特征提取）',
+      '技能：Python/C/C++，Pytorch/Tensorflow，RAG/LangChain入门',
+      '研究生GPA从3.3升至4.1/5.0，学术能力持续提升',
+      '英语：CET4 549，CET6 464（需重点关注）'
+    ],
+    scores:{ai:75,product:52,digital:60,international:42,delivery:60,analysis:65},
+    eval:'技术基础扎实，工程能力强，GPA持续提升体现学习能力。但产品思维和国际化视野与岗位核心要求存在明显差距，英语能力偏弱。建议在面试中重点评估其对业务问题的理解深度和成长潜力。'
+  },
+];
+
+// Sort by avg score for ranking
+const ranked = [...candidates].map((c,i)=>({...c,origIdx:i,avg:Math.round(Object.values(c.scores).reduce((a,b)=>a+b,0)/6)}))
+  .sort((a,b)=>b.avg-a.avg);
+
+const rankClass = ['rank-1','rank-2','rank-3','rank-other','rank-other','rank-other','rank-other','rank-other'];
+
+const grid = document.getElementById('grid');
+ranked.forEach((c, ri) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="rank-badge ${rankClass[ri]}">#${ri+1}</div>
+    <div class="card-top">
+      <div class="avatar" style="background:${COLORS[c.origIdx]}">${c.avatar}</div>
+      <div class="cinfo">
+        <div class="cname">${c.name}</div>
+        <div class="cschool">${c.school}</div>
+        <div class="cdeg">${c.degree}</div>
+      </div>
+      <div class="cscore">
+        <div class="score-ring" style="background:linear-gradient(135deg,${COLORS[c.origIdx]},${COLORS[c.origIdx]}99)">
+          ${c.avg}<small>分</small>
+        </div>
+      </div>
+    </div>
+    <div class="chart-wrap"><canvas id="cc${c.origIdx}"></canvas></div>
+    <div class="card-tags">
+      ${c.tags.map((t,ti)=>`<span class="tag${ti===0?' tag-red':''}">${t}</span>`).join('')}
+    </div>`;
+  card.onclick = () => openModal(c.origIdx);
+  grid.appendChild(card);
+
+  setTimeout(()=>{
+    new Chart(document.getElementById(`cc${c.origIdx}`).getContext('2d'),{
+      type:'radar',
+      data:{
+        labels:DIM_LABELS,
+        datasets:[{
+          data:DIM_KEYS.map(k=>c.scores[k]),
+          backgroundColor:COLORS[c.origIdx]+'22',
+          borderColor:COLORS[c.origIdx],
+          pointBackgroundColor:COLORS[c.origIdx],
+          borderWidth:2,pointRadius:3
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:'#e9ecef'},pointLabels:{font:{size:9.5},color:'#6b7280'}}}
+      }
+    });
+  },80*(ri+1));
+});
+
+// Topics
+const topics = [
+  {
+    n:1,title:'联想如何通过数字化重构东南亚市场售后服务体系？',
+    tags:['数字化运营','新兴市场','客户体验'],
+    desc:'东南亚市场分散、基础设施参差不齐，联想如何利用AI预测性维护、IoT设备监控和本地化服务数字平台，在降低运营成本的同时大幅提升客户NPS？',
+    pts:[
+      '预测性维护（Predictive Maintenance）vs. 传统被动响应模式的成本收益分析',
+      '本地合规要求（如印尼PDPL个人数据保护法）对售后数据共享与平台架构的影响',
+      '如何建立轻量化、可复制的「数字化服务站点」模型赋能本地经销商网络',
+      '通过数据驱动的SLA（服务等级协议）管理提升客户续约率与忠诚度'
+    ]
+  },
+  {
+    n:2,title:'全球供应链重构背景下，联想如何用数字孪生提升韧性？',
+    tags:['供应链数字化','数字孪生','风险管理'],
+    desc:'后疫情时代地缘政治风险与贸易壁垒加剧，联想作为全球最大PC制造商，如何用数字孪生技术实现供应链可视化、仿真压测和快速切换应急方案？',
+    pts:[
+      '数字孪生平台如何整合多级供应商数据（Tier 1/2/3）实现全链条端到端可见性',
+      'AI需求预测模型在跨区域库存调配中的实际落地挑战与精度权衡',
+      '供应链数字化如何平衡数据安全合规（不同国家数据本地化要求）与共享效率',
+      '与HP、Dell相比，联想供应链数字化的差异化路径与竞争优势'
+    ]
+  },
+  {
+    n:3,title:'联想B2B业务数字化：从「卖硬件」到「卖解决方案」的转型路径',
+    tags:['B2B数字化','服务化转型','客户成功'],
+    desc:'联想SSG（智慧服务集团）是其服务化转型的核心引擎。在海外B2B市场，数字化如何支撑从一次性产品交易向多年期托管服务合同的商业模式演进？',
+    pts:[
+      'TruScale（设备即服务/按需付费）模式在不同成熟度市场的落地差异与推进策略',
+      'Customer Success Management（客户成功管理）体系如何通过数据预警降低客户流失率',
+      'AI辅助方案报价系统：如何将非标定制需求快速转化为可交付的结构化方案',
+      '海外政企客户对数据主权的高度敏感性如何影响公有云服务销售策略'
+    ]
+  },
+  {
+    n:4,title:'金融科技崛起如何重塑联想海外B2B采购与融资模式？',
+    tags:['金融科技','嵌入式金融','跨境支付'],
+    desc:'在新兴市场传统银行渗透率低，数字支付与BNPL（先买后付）高速增长。联想如何借助嵌入式金融工具，降低海外中小企业客户采购门槛并扩大市场份额？',
+    pts:[
+      '嵌入式金融（Embedded Finance）如何整合进联想B2B电商/渠道销售平台的技术架构',
+      '跨境支付数字化（多币种结算、汇率风险对冲）对运营成本与客户体验的双重影响',
+      'BNPL与企业融资租赁模式的适用场景对比：哪类市场适合哪种模式？',
+      '利用交易行为数据为无信用历史的中小企业（SME）构建动态授信模型'
+    ]
+  },
+  {
+    n:5,title:'AI Agent在联想海外内部运营中的落地边界与企业治理挑战',
+    tags:['AI Agent','企业治理','人机协作'],
+    desc:'随着AI Agent技术日趋成熟，联想海外运营的哪些场景（客服、报价、合规审查、HR）最适合引入自主AI？如何在提效的同时规避风险、保障合规？',
+    pts:[
+      '优先自动化场景识别：技术支持工单分类、RFQ报价生成、合规文档审查的投入产出比',
+      '不同国家劳工法规对AI替代人工岗位的限制以及内部沟通变革管理策略',
+      'AI决策可解释性（Explainability）在金融审批、法务合规场景的监管要求',
+      '企业级AI治理框架设计：模型审计机制、偏见检测、人工兜底与责任归属'
+    ]
+  }
+];
+
+const topicsEl = document.getElementById('topics');
+topics.forEach((t,i)=>{
+  const el = document.createElement('div');
+  el.className = 'topic-card';
+  el.innerHTML = `
+    <div class="topic-head" onclick="toggleTopic(${i})">
+      <div class="topic-num">${t.n}</div>
+      <div class="topic-ttl">${t.title}</div>
+      <div class="topic-meta">${t.tags.map(tg=>`<span class="tag">${tg}</span>`).join('')}</div>
+      <div class="topic-arrow" id="ta${i}">▾</div>
+    </div>
+    <div class="topic-body" id="tb${i}">
+      <div class="topic-desc">${t.desc}</div>
+      <ul class="topic-pts">${t.pts.map(p=>`<li>${p}</li>`).join('')}</ul>
+    </div>`;
+  topicsEl.appendChild(el);
+});
+
+function toggleTopic(i){
+  const b=document.getElementById(`tb${i}`), a=document.getElementById(`ta${i}`);
+  b.classList.toggle('open');
+  a.textContent = b.classList.contains('open')?'▴':'▾';
+}
+
+// Modal
+let mChart=null;
+function openModal(origIdx){
+  const c=candidates[origIdx];
+  document.getElementById('mName').textContent=c.name;
+  document.getElementById('mSchool').textContent=`${c.school} · ${c.degree}`;
+  document.getElementById('mHl').innerHTML=c.highlights.map(h=>`<li>${h}</li>`).join('');
+  document.getElementById('mSc').innerHTML=DIM_KEYS.map((k,i)=>`
+    <div class="smi">
+      <div class="smi-d">${DIM_LABELS[i]}</div>
+      <div class="smi-v">${c.scores[k]}</div>
+      <div class="smi-bar"><div class="smi-fill" style="width:${c.scores[k]}%"></div></div>
+    </div>`).join('');
+  document.getElementById('mEval').textContent=c.eval;
+  document.getElementById('overlay').classList.add('on');
+  setTimeout(()=>{
+    if(mChart){mChart.destroy();mChart=null;}
+    mChart=new Chart(document.getElementById('mChart').getContext('2d'),{
+      type:'radar',
+      data:{
+        labels:DIM_LABELS,
+        datasets:[{
+          label:c.name,
+          data:DIM_KEYS.map(k=>c.scores[k]),
+          backgroundColor:COLORS[origIdx]+'33',
+          borderColor:COLORS[origIdx],
+          pointBackgroundColor:COLORS[origIdx],
+          borderWidth:2,pointRadius:4
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:10}},grid:{color:'#e9ecef'},pointLabels:{font:{size:12},color:'#374151'}}}
+      }
+    });
+  },50);
+}
+function closeModal(){document.getElementById('overlay').classList.remove('on');}
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+</script>
+</body>
+</html>

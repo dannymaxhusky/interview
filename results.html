@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>联想海外业务 · 考官后台 | 成绩管理系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;min-height:100vh;color:#1a1a2e}
+
+.header{background:linear-gradient(135deg,#0f0f1e,#1a1a2e);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+.hd-left{display:flex;align-items:center;gap:14px}
+.lenovo-badge{width:40px;height:40px;background:#CC0000;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff}
+.hd-text .co{font-size:17px;font-weight:700;color:#fff}
+.hd-text .sub{font-size:11px;color:#9ca3af;margin-top:1px}
+.hd-right a{color:#9ca3af;font-size:13px;text-decoration:none}
+.hd-right a:hover{color:#fff}
+
+/* ── Login ── */
+#loginScreen{min-height:calc(100vh - 72px);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:#fff;border-radius:18px;padding:44px 48px;max-width:420px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center}
+.login-icon{font-size:48px;margin-bottom:16px}
+.login-title{font-size:24px;font-weight:800;margin-bottom:8px}
+.login-sub{font-size:14px;color:#6b7280;margin-bottom:28px;line-height:1.6}
+.pw-input{width:100%;padding:12px 16px;border:2px solid #e5e7eb;border-radius:10px;font-size:16px;font-family:inherit;outline:none;text-align:center;letter-spacing:4px;transition:.2s}
+.pw-input:focus{border-color:#CC0000}
+.login-btn{width:100%;padding:13px;background:#CC0000;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:14px;transition:.2s}
+.login-btn:hover{background:#a80000}
+.login-err{color:#CC0000;font-size:13px;margin-top:10px;display:none}
+.login-hint{font-size:12px;color:#9ca3af;margin-top:16px}
+
+/* ── Dashboard ── */
+#dashboard{display:none;padding:28px 32px;max-width:1200px;margin:0 auto}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:#fff;border-radius:12px;padding:20px 22px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.sc-n{font-size:30px;font-weight:800}
+.sc-l{font-size:12px;color:#6b7280;margin-top:4px}
+.sc-red{color:#CC0000}
+.sc-green{color:#16a34a}
+.sc-blue{color:#1d4ed8}
+.sc-amber{color:#d97706}
+
+.section-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-size:16px;font-weight:700;border-left:4px solid #CC0000;padding-left:10px}
+.import-btn{padding:9px 20px;background:#CC0000;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s}
+.import-btn:hover{background:#a80000}
+.clear-btn{padding:9px 20px;background:#f3f4f6;color:#6b7280;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;margin-left:8px}
+.clear-btn:hover{background:#fee2e2;color:#CC0000}
+
+/* Import Modal */
+.imp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.imp-overlay.on{display:flex}
+.imp-box{background:#fff;border-radius:16px;padding:30px;max-width:540px;width:100%}
+.imp-title{font-size:18px;font-weight:800;margin-bottom:10px}
+.imp-sub{font-size:13px;color:#6b7280;margin-bottom:16px;line-height:1.6}
+.imp-textarea{width:100%;height:120px;border:2px solid #e5e7eb;border-radius:10px;padding:12px 14px;font-size:12px;font-family:monospace;resize:vertical;outline:none;transition:.2s}
+.imp-textarea:focus{border-color:#CC0000}
+.imp-err{color:#CC0000;font-size:12px;margin-top:6px;display:none}
+.imp-actions{display:flex;gap:10px;margin-top:16px}
+.imp-ok{flex:1;padding:11px;background:#CC0000;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s}
+.imp-ok:hover{background:#a80000}
+.imp-cancel{padding:11px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+
+/* Table */
+.table-wrap{background:#fff;border-radius:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);overflow:hidden;margin-bottom:28px}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#f9fafb;border-bottom:2px solid #e5e7eb}
+th{padding:13px 16px;font-size:12px;font-weight:700;color:#6b7280;text-align:left;text-transform:uppercase;letter-spacing:.5px}
+tbody tr{border-bottom:1px solid #f3f4f6;cursor:pointer;transition:.15s}
+tbody tr:hover{background:#fafafa}
+tbody tr.expanded{background:#fff8f8}
+td{padding:14px 16px;font-size:14px;color:#374151}
+.td-name{font-weight:700;color:#1a1a2e}
+.score-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-weight:700;font-size:14px}
+.badge-ex{background:#dcfce7;color:#16a34a}
+.badge-good{background:#dbeafe;color:#1d4ed8}
+.badge-avg{background:#fef9c3;color:#92400e}
+.badge-poor{background:#fee2e2;color:#CC0000}
+.time-cell{color:#6b7280;font-size:13px}
+.pct-bar{height:6px;background:#e5e7eb;border-radius:3px;margin-top:4px;width:80px}
+.pct-fill{height:100%;border-radius:3px}
+
+/* Detail row */
+.detail-row{display:none}
+.detail-row.on{display:table-row}
+.detail-cell{padding:0!important;border-bottom:1px solid #f3f4f6}
+.detail-inner{padding:20px 24px 24px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.dg-title{font-size:13px;font-weight:700;color:#CC0000;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Q answers */
+.q-list{display:flex;flex-direction:column;gap:8px}
+.q-row{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:8px;font-size:13px}
+.q-row.correct{background:#f0fdf4}
+.q-row.wrong{background:#fef2f2}
+.q-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.q-content{flex:1}
+.q-label{font-weight:600;color:#374151;margin-bottom:2px}
+.q-ans{font-size:12px;color:#6b7280}
+.q-ans .user-ans{font-weight:600}
+.q-ans .correct-ans{color:#16a34a;font-weight:600}
+.q-ans .wrong-ans{color:#CC0000;font-weight:600;text-decoration:line-through}
+
+/* Interview Qs */
+.iq-section{margin-top:0}
+.iq-item{background:#f9fafb;border-radius:10px;padding:12px 16px;margin-bottom:10px;border-left:3px solid #CC0000}
+.iq-category{font-size:10px;font-weight:700;color:#CC0000;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.iq-text{font-size:13px;color:#374151;line-height:1.6}
+.iq-tip{font-size:11px;color:#9ca3af;margin-top:4px;font-style:italic}
+
+.empty-state{text-align:center;padding:60px 20px;color:#9ca3af}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-text{font-size:16px;font-weight:600;margin-bottom:6px;color:#6b7280}
+.empty-sub{font-size:13px;line-height:1.6}
+
+.timestamp{font-size:11px;color:#9ca3af}
+.del-btn{padding:4px 10px;background:#fee2e2;color:#CC0000;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.del-btn:hover{background:#fecaca}
+
+@media(max-width:700px){
+  #dashboard{padding:16px};
+  .stats-row{grid-template-columns:1fr 1fr}
+  .detail-grid{grid-template-columns:1fr}
+  table{font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="hd-left">
+    <div class="lenovo-badge">Le</div>
+    <div class="hd-text">
+      <div class="co">联想集团 · 海外业务事业部</div>
+      <div class="sub">数字化转型实习岗 · 考官后台管理系统</div>
+    </div>
+  </div>
+  <div class="hd-right">
+    <a href="index.html">← 返回候选人列表</a>
+  </div>
+</header>
+
+<!-- Login -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-icon">🔐</div>
+    <div class="login-title">考官专用后台</div>
+    <div class="login-sub">请输入考官访问密码进入成绩管理系统。</div>
+    <input class="pw-input" id="pwInput" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">进入后台 →</button>
+    <div class="login-err" id="loginErr">密码错误，请重试</div>
+    <div class="login-hint">默认密码：<strong>Lenovo@2025</strong></div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard">
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card"><div class="sc-n sc-red" id="statTotal">0</div><div class="sc-l">参与人数</div></div>
+    <div class="stat-card"><div class="sc-n sc-green" id="statAvg">—</div><div class="sc-l">平均得分</div></div>
+    <div class="stat-card"><div class="sc-n sc-blue" id="statTop">—</div><div class="sc-l">最高分</div></div>
+    <div class="stat-card"><div class="sc-n sc-amber" id="statAvgTime">—</div><div class="sc-l">平均用时</div></div>
+  </div>
+
+  <div class="section-bar">
+    <div class="sec-title">成绩列表</div>
+    <div>
+      <button class="import-btn" onclick="showImport()">＋ 导入成绩码</button>
+      <button class="clear-btn" onclick="clearAll()">🗑 清空数据</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>姓名</th>
+          <th>成绩</th>
+          <th>百分比</th>
+          <th>用时</th>
+          <th>提交时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📋</div>
+      <div class="empty-text">暂无成绩数据</div>
+      <div class="empty-sub">候选人完成测评后，请让他们将<br>成绩码发送给您，点击「导入成绩码」添加。</div>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="imp-overlay" id="impOverlay">
+  <div class="imp-box">
+    <div class="imp-title">导入成绩码</div>
+    <div class="imp-sub">请将候选人发送的成绩码粘贴到下方文本框，支持一次导入一条记录。</div>
+    <textarea class="imp-textarea" id="impCode" placeholder="粘贴成绩码到此处..."></textarea>
+    <div class="imp-err" id="impErr">成绩码格式错误，请检查是否完整复制</div>
+    <div class="imp-actions">
+      <button class="imp-ok" onclick="importCode()">✓ 导入</button>
+      <button class="imp-cancel" onclick="closeImport()">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PASSWORD = 'Lenovo@2025';
+const STORAGE_KEY = 'lenovo_results_v2';
+
+const qShortLabels = [
+  'Q1 RAG技术', 'Q2 AI客服评估', 'Q3 Prompt工程',
+  'Q4 转型关键因素', 'Q5 联想SSG战略', 'Q6 GDPR合规',
+  'Q7 数字孪生', 'Q8 工业互联网', 'Q9 MVP策略', 'Q10 海外转型挑战'
+];
+
+const correctAnswers = [1,1,2,1,1,1,2,1,1,1]; // 0-indexed B,B,C,B,B,B,C,B,B,B
+
+const optLabels = ['A','B','C','D'];
+
+// Per-question follow-up interview probes (shown when candidate gets it wrong)
+const qFollowUps = [
+  {cat:'专业技术', q:'请解释 RAG 与模型微调（Fine-tuning）的核心区别——各自适合解决什么类型的业务问题？', tip:'考察候选人对 AI 技术路线选择的判断力'},
+  {cat:'产品设计', q:'如果你主导一个 AI 客服系统上线，请描述你会如何设计验收标准，包括技术指标和业务指标各取哪些？', tip:'考察产品思维与数据驱动意识'},
+  {cat:'AI应用', q:'请分享一个你亲手优化 Prompt 的实际案例，过程中遇到了什么挑战，最终如何解决？', tip:'考察动手能力与经验深度'},
+  {cat:'变革管理', q:'在你的项目经历中，有哪些组织或文化因素曾经阻碍了技术项目的推进落地？你如何应对的？', tip:'考察对转型挑战的实感与应对策略'},
+  {cat:'商业洞察', q:'请谈谈你对联想从硬件公司向服务公司转型的理解——你认为最大的挑战在哪里，机会又在哪里？', tip:'考察对联想业务的研究深度'},
+  {cat:'合规风控', q:'在海外 B2B 业务中，数据跨境合规（如 GDPR vs 中国数据安全法）最大的实操挑战是什么？如何平衡合规与业务效率？', tip:'考察国际化视野与风险意识'},
+  {cat:'技术理解', q:'请举一个数字孪生的具体应用案例，说明它与传统 BI 报表在解决「信息孤岛」问题上有何本质区别？', tip:'考察对数字化技术的实质理解'},
+  {cat:'行业理解', q:'请举例说明工业互联网与消费互联网在产品设计逻辑上的核心差异，以及这对产品经理意味着什么？', tip:'考察对 B2B 工业场景的理解深度'},
+  {cat:'产品思维', q:'请描述一次你参与从0到1产品落地的经历，你如何在资源有限的情况下快速验证产品的核心假设？', tip:'考察精益创业思维和实际落地经验'},
+  {cat:'全球化视野', q:'如果你被派驻东南亚市场主导一个联想数字化产品项目，你会如何制定本地化策略？请列出前三个优先考量。', tip:'考察全球化思维与本土化落地能力'}
+];
+
+// General interview questions always shown
+const generalQs = [
+  {cat:'动机与匹配', q:'请用 2-3 分钟介绍你最有代表性的一个项目——重点讲你的贡献和可量化的成果。', tip:'观察候选人的表达结构与数据意识'},
+  {cat:'岗位匹配', q:'你为什么对联想海外业务的数字化转型岗位感兴趣？你认为自己最核心的匹配优势是什么？', tip:'评估候选人对联想业务的了解程度'},
+  {cat:'跨文化能力', q:'请描述一次你与跨文化团队合作或面对语言障碍的经历，你是如何克服挑战并达成目标的？', tip:'海外业务岗位必考项，重点观察'},
+  {cat:'前瞻视野', q:'你如何看待 AI 在未来 3-5 年内对联想全球 B2B 业务最重要的影响？哪个海外市场你认为机会最大，为什么？', tip:'考察战略思维与行业洞察力'}
+];
+
+function doLogin(){
+  const pw = document.getElementById('pwInput').value;
+  if(pw === PASSWORD){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    loadResults();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+document.getElementById('pwInput').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+function getResults(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }
+  catch(e){ return []; }
+}
+
+function saveResults(arr){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+function loadResults(){
+  // Also pull in old-format individual keys
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('lenovo_exam_'));
+  let arr = getResults();
+  keys.forEach(k=>{
+    try{
+      const r=JSON.parse(localStorage.getItem(k));
+      if(r && r.name && !arr.find(x=>x.timestamp===r.timestamp)){
+        arr.push(r);
+        localStorage.removeItem(k);
+      }
+    }catch(e){}
+  });
+  saveResults(arr);
+  renderResults(arr);
+}
+
+function renderResults(arr){
+  const body = document.getElementById('resultsBody');
+  body.innerHTML='';
+  document.getElementById('emptyState').style.display = arr.length?'none':'block';
+
+  if(!arr.length){ updateStats([]); return; }
+
+  arr = [...arr].sort((a,b)=>b.score-a.score || a.elapsed-b.elapsed);
+  updateStats(arr);
+
+  arr.forEach((r,i)=>{
+    const pct = Math.round(r.score/r.total*100);
+    const mins=Math.floor(r.elapsed/60),secs=r.elapsed%60;
+    const timeStr=`${mins}分${String(secs).padStart(2,'0')}秒`;
+    const dt=new Date(r.timestamp);
+    const dtStr=`${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+
+    let bClass='badge-poor';
+    if(pct>=90)bClass='badge-ex';
+    else if(pct>=70)bClass='badge-good';
+    else if(pct>=50)bClass='badge-avg';
+
+    let barColor='#CC0000';
+    if(pct>=90)barColor='#16a34a';
+    else if(pct>=70)barColor='#1d4ed8';
+    else if(pct>=50)barColor='#d97706';
+
+    const row = document.createElement('tr');
+    row.id=`row${i}`;
+    row.innerHTML=`
+      <td>${i+1}</td>
+      <td class="td-name">${r.name}</td>
+      <td><span class="score-badge ${bClass}">${r.score} / ${r.total}</span></td>
+      <td>
+        <div style="font-size:13px;font-weight:600">${pct}%</div>
+        <div class="pct-bar"><div class="pct-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      </td>
+      <td class="time-cell">${timeStr}</td>
+      <td class="timestamp">${dtStr}</td>
+      <td><button class="del-btn" onclick="event.stopPropagation();deleteResult(${r.timestamp})">删除</button></td>`;
+    row.onclick=()=>toggleDetail(i,r);
+    body.appendChild(row);
+
+    const detailRow = document.createElement('tr');
+    detailRow.className='detail-row';
+    detailRow.id=`detail${i}`;
+    const detailCell = document.createElement('td');
+    detailCell.colSpan=7;
+    detailCell.className='detail-cell';
+    detailCell.id=`detailCell${i}`;
+    detailRow.appendChild(detailCell);
+    body.appendChild(detailRow);
+  });
+}
+
+function toggleDetail(i, r){
+  const dr = document.getElementById(`detail${i}`);
+  const mainRow = document.getElementById(`row${i}`);
+  if(dr.classList.contains('on')){
+    dr.classList.remove('on');
+    mainRow.classList.remove('expanded');
+    return;
+  }
+  dr.classList.add('on');
+  mainRow.classList.add('expanded');
+
+  // Build detail content
+  const wrongQs = [];
+  r.answers.forEach((a,qi)=>{ if(a!==correctAnswers[qi]) wrongQs.push(qi); });
+
+  // Q answer list
+  const qListHtml = r.answers.map((a,qi)=>{
+    const correct = a === correctAnswers[qi];
+    const userLetter = a>=0?optLabels[a]:'未作答';
+    const correctLetter = optLabels[correctAnswers[qi]];
+    return `<div class="q-row ${correct?'correct':'wrong'}">
+      <div class="q-icon">${correct?'✅':'❌'}</div>
+      <div class="q-content">
+        <div class="q-label">${qShortLabels[qi]}</div>
+        <div class="q-ans">
+          ${correct
+            ? `<span class="correct-ans">答案正确（${correctLetter}）</span>`
+            : `<span class="wrong-ans">您选：${userLetter}</span>　→　<span class="correct-ans">正确：${correctLetter}</span>`
+          }
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Interview questions
+  const iqItems = [...generalQs];
+  wrongQs.forEach(qi=>iqItems.push(qFollowUps[qi]));
+
+  const iqHtml = iqItems.map(iq=>`
+    <div class="iq-item">
+      <div class="iq-category">${iq.cat}</div>
+      <div class="iq-text">${iq.q}</div>
+      <div class="iq-tip">💡 ${iq.tip}</div>
+    </div>`).join('');
+
+  document.getElementById(`detailCell${i}`).innerHTML=`
+    <div class="detail-inner">
+      <div class="detail-grid">
+        <div>
+          <div class="dg-title">📝 答题详情（${r.score}/${r.total} 正确）</div>
+          <div class="q-list">${qListHtml}</div>
+        </div>
+        <div>
+          <div class="dg-title">🎤 推荐面试题（${iqItems.length} 道）</div>
+          <div class="iq-section">${iqHtml}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function updateStats(arr){
+  document.getElementById('statTotal').textContent=arr.length;
+  if(!arr.length){
+    document.getElementById('statAvg').textContent='—';
+    document.getElementById('statTop').textContent='—';
+    document.getElementById('statAvgTime').textContent='—';
+    return;
+  }
+  const avg=(arr.reduce((s,r)=>s+r.score,0)/arr.length).toFixed(1);
+  const top=Math.max(...arr.map(r=>r.score));
+  const avgSec=Math.round(arr.reduce((s,r)=>s+r.elapsed,0)/arr.length);
+  const m=Math.floor(avgSec/60),s=avgSec%60;
+  document.getElementById('statAvg').textContent=avg;
+  document.getElementById('statTop').textContent=`${top}/10`;
+  document.getElementById('statAvgTime').textContent=`${m}分${s}秒`;
+}
+
+function showImport(){document.getElementById('impOverlay').classList.add('on');document.getElementById('impCode').focus();}
+function closeImport(){document.getElementById('impOverlay').classList.remove('on');document.getElementById('impCode').value='';document.getElementById('impErr').style.display='none';}
+
+function importCode(){
+  const raw=document.getElementById('impCode').value.trim();
+  try{
+    const json=JSON.parse(decodeURIComponent(atob(raw)));
+    if(!json.name||json.score===undefined||!json.answers) throw new Error('invalid');
+    const arr=getResults();
+    if(arr.find(r=>r.timestamp===json.timestamp)){
+      document.getElementById('impErr').textContent='该成绩码已导入过';
+      document.getElementById('impErr').style.display='block';
+      return;
+    }
+    arr.push(json);
+    saveResults(arr);
+    closeImport();
+    renderResults(arr);
+  }catch(e){
+    document.getElementById('impErr').textContent='成绩码格式错误，请检查是否完整复制';
+    document.getElementById('impErr').style.display='block';
+  }
+}
+
+function deleteResult(ts){
+  if(!confirm('确认删除该条成绩记录？')) return;
+  const arr=getResults().filter(r=>r.timestamp!==ts);
+  saveResults(arr);
+  renderResults(arr);
+}
+
+function clearAll(){
+  if(!confirm('确认清空所有成绩数据？此操作不可恢复！')) return;
+  saveResults([]);
+  renderResults([]);
+}
+
+document.getElementById('impOverlay').addEventListener('click',e=>{if(e.target.id==='impOverlay')closeImport();});
+</script>
+</body>
+</html>

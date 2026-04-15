@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>联想海外业务 · 数字化转型实习 | 在线测评</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;min-height:100vh;color:#1a1a2e}
+
+.header{background:linear-gradient(135deg,#0f0f1e,#1a1a2e);padding:16px 32px;display:flex;align-items:center;gap:14px}
+.lenovo-badge{width:40px;height:40px;background:#CC0000;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff}
+.hd-text .co{font-size:17px;font-weight:700;color:#fff}
+.hd-text .sub{font-size:11px;color:#9ca3af;margin-top:1px}
+
+/* ── Screens ── */
+.screen{display:none;min-height:calc(100vh - 72px)}
+.screen.active{display:flex;align-items:center;justify-content:center;padding:30px 16px}
+
+/* ── Welcome ── */
+.welcome-box{background:#fff;border-radius:18px;padding:44px 48px;max-width:560px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center}
+.welcome-icon{font-size:52px;margin-bottom:16px}
+.welcome-title{font-size:26px;font-weight:800;color:#1a1a2e;margin-bottom:8px}
+.welcome-sub{font-size:14px;color:#6b7280;line-height:1.7;margin-bottom:28px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;text-align:left}
+.info-item{background:#f9fafb;border-radius:10px;padding:12px 16px;border-left:3px solid #CC0000}
+.info-label{font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px}
+.info-val{font-size:14px;font-weight:600;color:#1a1a2e;margin-top:3px}
+.name-wrap{margin-bottom:22px;text-align:left}
+.name-label{font-size:14px;font-weight:600;color:#374151;margin-bottom:8px;display:block}
+.name-input{width:100%;padding:12px 16px;border:2px solid #e5e7eb;border-radius:10px;font-size:16px;font-family:inherit;outline:none;transition:.2s}
+.name-input:focus{border-color:#CC0000}
+.start-btn{width:100%;padding:14px;background:#CC0000;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s}
+.start-btn:hover{background:#a80000}
+.start-btn:disabled{background:#d1d5db;cursor:not-allowed}
+
+/* ── Exam ── */
+#examScreen{display:none;flex-direction:column}
+.exam-topbar{background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.progress-wrap{flex:1;max-width:400px}
+.progress-info{display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:6px}
+.progress-bar{height:6px;background:#e5e7eb;border-radius:3px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#CC0000,#f87171);border-radius:3px;transition:.4s}
+.timer{display:flex;align-items:center;gap:8px;font-size:22px;font-weight:800;color:#1a1a2e}
+.timer.warn{color:#CC0000;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.timer-icon{font-size:18px}
+
+.exam-body{max-width:720px;width:100%;margin:36px auto;padding:0 16px}
+.q-card{background:#fff;border-radius:16px;padding:32px 36px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.q-meta{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.q-num{font-size:13px;font-weight:700;color:#6b7280}
+.q-type{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:600}
+.type-pro{background:#fff0f0;color:#CC0000}
+.type-dt{background:#eff6ff;color:#1d4ed8}
+.q-text{font-size:17px;font-weight:600;color:#1a1a2e;line-height:1.7;margin-bottom:24px}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border:2px solid #e5e7eb;border-radius:12px;cursor:pointer;transition:.2s;user-select:none}
+.option:hover{border-color:#CC0000;background:#fff8f8}
+.option.selected{border-color:#CC0000;background:#fff0f0}
+.opt-letter{width:28px;height:28px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;transition:.2s}
+.option.selected .opt-letter{background:#CC0000;color:#fff}
+.opt-text{font-size:14px;color:#374151;line-height:1.6;padding-top:4px}
+
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+.nav-btn{padding:11px 28px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;border:none;transition:.2s}
+.nav-prev{background:#f3f4f6;color:#374151}
+.nav-prev:hover{background:#e5e7eb}
+.nav-next{background:#CC0000;color:#fff}
+.nav-next:hover{background:#a80000}
+.nav-next:disabled{background:#d1d5db;cursor:not-allowed}
+.q-dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:280px}
+.dot{width:10px;height:10px;border-radius:50%;background:#e5e7eb;cursor:pointer;transition:.2s}
+.dot.answered{background:#CC0000}
+.dot.current{background:#1a1a2e;transform:scale(1.3)}
+
+/* ── Review ── */
+#reviewScreen{display:none;flex-direction:column;align-items:center;padding:30px 16px}
+.review-box{background:#fff;border-radius:18px;padding:32px 36px;max-width:680px;width:100%;box-shadow:0 2px 16px rgba(0,0,0,.07)}
+.review-title{font-size:22px;font-weight:800;margin-bottom:6px}
+.review-sub{font-size:14px;color:#6b7280;margin-bottom:24px}
+.review-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px}
+.rv-item{background:#f9fafb;border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:.2s;border:2px solid transparent}
+.rv-item:hover{border-color:#CC0000}
+.rv-item.answered{background:#fff0f0;border-color:#fca5a5}
+.rv-num{font-size:12px;color:#9ca3af}
+.rv-status{font-size:18px;margin-top:2px}
+.submit-btn{width:100%;padding:14px;background:#CC0000;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;margin-top:8px}
+.submit-btn:hover{background:#a80000}
+.back-btn{width:100%;padding:12px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;margin-top:10px}
+.back-btn:hover{background:#e5e7eb}
+
+/* ── Result ── */
+#resultScreen{display:none;flex-direction:column;align-items:center;padding:30px 16px}
+.result-box{background:#fff;border-radius:18px;padding:40px 44px;max-width:580px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08);text-align:center}
+.result-emoji{font-size:60px;margin-bottom:16px}
+.result-name{font-size:18px;color:#6b7280;margin-bottom:4px}
+.result-score{font-size:64px;font-weight:900;line-height:1;margin-bottom:4px}
+.result-score.excellent{color:#16a34a}
+.result-score.good{color:#1d4ed8}
+.result-score.average{color:#d97706}
+.result-score.poor{color:#CC0000}
+.result-total{font-size:16px;color:#9ca3af;margin-bottom:20px}
+.result-time{font-size:14px;color:#6b7280;margin-bottom:28px;padding:10px 20px;background:#f9fafb;border-radius:8px;display:inline-block}
+.result-divider{border:none;border-top:1px solid #f3f4f6;margin:24px 0}
+.code-section{text-align:left}
+.code-label{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px}
+.code-box{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;font-size:11px;font-family:monospace;color:#6b7280;word-break:break-all;line-height:1.5;max-height:80px;overflow:hidden;cursor:pointer;position:relative}
+.code-box::after{content:'点击复制';position:absolute;right:10px;bottom:8px;font-size:10px;background:#CC0000;color:#fff;padding:2px 8px;border-radius:6px;font-family:inherit}
+.code-note{font-size:12px;color:#9ca3af;margin-top:8px;line-height:1.6}
+.copy-toast{display:none;background:#16a34a;color:#fff;font-size:13px;padding:6px 18px;border-radius:20px;margin-top:10px;text-align:center}
+.copy-toast.show{display:block}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="lenovo-badge">Le</div>
+  <div class="hd-text">
+    <div class="co">联想集团 · 海外业务事业部</div>
+    <div class="sub">数字化转型实习岗 · 在线测评系统</div>
+  </div>
+</header>
+
+<!-- Welcome Screen -->
+<div class="screen active" id="welcomeScreen">
+  <div class="welcome-box">
+    <div class="welcome-icon">📋</div>
+    <div class="welcome-title">实习生在线测评</div>
+    <div class="welcome-sub">本测评共10道单选题，涵盖专业知识与数字化转型两大模块，请独立完成作答。</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">题目数量</div><div class="info-val">10 道单选题</div></div>
+      <div class="info-item"><div class="info-label">建议时长</div><div class="info-val">20 分钟</div></div>
+      <div class="info-item"><div class="info-label">题目类型</div><div class="info-val">专业题 3 道</div></div>
+      <div class="info-item"><div class="info-label">题目类型</div><div class="info-val">数字化转型 7 道</div></div>
+    </div>
+    <div class="name-wrap">
+      <label class="name-label">请输入您的姓名</label>
+      <input class="name-input" id="nameInput" type="text" placeholder="例：张三" maxlength="20" oninput="checkName()">
+    </div>
+    <button class="start-btn" id="startBtn" disabled onclick="startExam()">开始测评 →</button>
+  </div>
+</div>
+
+<!-- Exam Screen -->
+<div id="examScreen">
+  <div class="exam-topbar">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progText">第 1 题 / 共 10 题</span>
+        <span id="progPct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="q-dots" id="dots"></div>
+    <div class="timer" id="timer"><span class="timer-icon">⏱</span><span id="timerVal">20:00</span></div>
+  </div>
+  <div class="exam-body">
+    <div class="q-card">
+      <div class="q-meta">
+        <span class="q-num" id="qNum">Q1</span>
+        <span class="q-type" id="qType"></span>
+      </div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="options"></div>
+      <div class="q-nav">
+        <button class="nav-btn nav-prev" id="prevBtn" onclick="prevQ()">← 上一题</button>
+        <button class="nav-btn nav-next" id="nextBtn" onclick="nextQ()">下一题 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Screen -->
+<div id="reviewScreen">
+  <div class="review-box">
+    <div class="review-title">提交确认</div>
+    <div class="review-sub" id="reviewSub"></div>
+    <div class="review-grid" id="reviewGrid"></div>
+    <button class="submit-btn" onclick="submitExam()">✓ 确认提交</button>
+    <button class="back-btn" onclick="backToExam()">← 返回检查</button>
+  </div>
+</div>
+
+<!-- Result Screen -->
+<div id="resultScreen">
+  <div class="result-box">
+    <div class="result-emoji" id="resEmoji"></div>
+    <div class="result-name" id="resName"></div>
+    <div class="result-score" id="resScore"></div>
+    <div class="result-total">/ 10 题</div>
+    <div class="result-time" id="resTime"></div>
+    <hr class="result-divider">
+    <div class="code-section">
+      <div class="code-label">📤 成绩码（发给考官）</div>
+      <div class="code-box" id="codeBox" onclick="copyCode()"></div>
+      <div class="copy-toast" id="copyToast">✓ 已复制到剪贴板</div>
+      <div class="code-note">请将以上成绩码通过微信 / 邮件发送给HR，考官将凭此码查看您的详细答题记录。</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    id:1, type:'专业',
+    text:'关于 RAG（检索增强生成）技术，以下描述<strong>正确</strong>的是？',
+    opts:[
+      '文档分块粒度越大，检索效果越好',
+      'RAG 通过外部知识库增强，可有效减少大模型产生幻觉的频率',
+      'RAG 与模型微调（Fine-tuning）能完全互相替代，解决相同问题',
+      '向量数据库存储的是文本的关键词索引，而非语义向量'
+    ],
+    ans:1,
+    exp:'RAG 通过检索外部知识库为模型提供事实依据，有效减少幻觉。分块粒度需根据语义合理设计；向量数据库存储的是语义向量而非关键词；RAG 与 Fine-tuning 解决的是不同类型的问题（外部知识 vs. 内化能力）。'
+  },
+  {
+    id:2, type:'专业',
+    text:'设计 AI 智能客服产品的评估体系时，最核心的指标组合是？',
+    opts:[
+      '日活跃用户数（DAU）＋ 用户平均停留时长 ＋ 界面满意度',
+      '意图识别准确率 ＋ 问题解决率 ＋ 人工转接率',
+      '模型参数规模 ＋ GPU 算力消耗 ＋ 训练数据量',
+      '页面加载速度 ＋ 界面美观度评分 ＋ 功能覆盖数量'
+    ],
+    ans:1,
+    exp:'AI 客服的核心价值在于准确理解意图、解决用户问题并减少人工干预。意图识别准确率反映 AI 能力，问题解决率反映业务价值，人工转接率反映 AI 替代效果，三者共同构成核心评估体系。'
+  },
+  {
+    id:3, type:'专业',
+    text:'关于 Prompt Engineering（提示词工程），以下说法<strong>错误</strong>的是？',
+    opts:[
+      'Chain-of-Thought（思维链）提示能显著提升模型在复杂推理任务上的表现',
+      '在 Prompt 中提供少量示例（Few-shot）可帮助模型理解期望的输出格式',
+      'Prompt 越长、细节越多，模型效果一定越好',
+      '明确的角色设定（Role Prompting）可有效引导模型的输出风格与专业度'
+    ],
+    ans:2,
+    exp:'Prompt 并非越长越好，过长的 Prompt 可能引入噪声或超出模型有效注意力范围。其余三项均为正确的 Prompt 工程原则。'
+  },
+  {
+    id:4, type:'数字化转型',
+    text:'企业数字化转型中，被实践反复证明<strong>最关键</strong>的成功因素是？',
+    opts:[
+      '尽快购置最先进的 AI 和云计算硬件设备',
+      '高层领导的战略承诺与自上而下的组织变革管理',
+      '一次性将所有系统完整迁移至数字化平台，追求速度',
+      '优先引进知名品牌的成熟商业软件，避免自研风险'
+    ],
+    ans:1,
+    exp:'数字化转型本质是组织变革而非技术采购。麦肯锡等调研显示，70% 的转型失败源于组织能力不足和领导力缺失，而非技术本身。领导层承诺与变革管理是最关键的成功因素。'
+  },
+  {
+    id:5, type:'数字化转型',
+    text:'联想集团 SSG（智慧服务集团）的核心转型逻辑是？',
+    opts:[
+      '专注智能手机业务，大幅减少 PC 及服务器产品线投入',
+      '从硬件产品销售商向 IT 解决方案与托管服务提供商转型，构建持续性收入来源',
+      '将所有研发和制造业务迁移至海外低成本地区',
+      '通过大规模并购竞争对手快速扩大全球市场份额'
+    ],
+    ans:1,
+    exp:'联想 SSG 战略旨在从一次性硬件销售转向订阅制、按需付费的托管 IT 服务（TruScale）模式，提升收入可预测性和毛利率，是从 Product Company 向 Service Company 转型的典型路径。'
+  },
+  {
+    id:6, type:'数字化转型',
+    text:'欧盟 GDPR 对跨国企业数字化运营的<strong>核心</strong>影响是？',
+    opts:[
+      '要求所有涉欧业务数据必须存储在欧盟境内服务器（数据强制本地化）',
+      '赋予用户数据控制权（删除权/可携带权），要求企业获得明确同意才能处理个人数据',
+      '禁止企业使用任何 AI 算法自动分析用户行为数据',
+      '强制要求企业所有数据分析人员通过欧盟官方认证考试'
+    ],
+    ans:1,
+    exp:'GDPR 的核心是数据主体权利保护，包括知情权、访问权、更正权、删除权（被遗忘权）及数据可携带权，并要求企业在处理个人数据前获得明确合法依据。选项 A 的"强制本地化"并非 GDPR 本身的要求。'
+  },
+  {
+    id:7, type:'数字化转型',
+    text:'关于供应链数字化中「数字孪生」技术，以下描述<strong>错误</strong>的是？',
+    opts:[
+      '数字孪生可在虚拟环境中模拟供应链中断场景，提前制定应急预案',
+      '数字孪生能实时同步物理供应链状态，显著提升端到端可见性',
+      '部署数字孪生后，企业完全不再需要人工干预供应链决策',
+      '数字孪生可通过仿真优化库存配置和多式联运路径规划'
+    ],
+    ans:2,
+    exp:'数字孪生是辅助决策工具，而非替代人工判断。面对极端事件、战略决策或需要伦理考量的场景时，人工监督和干预仍不可或缺。其余三项均为数字孪生的真实价值体现。'
+  },
+  {
+    id:8, type:'数字化转型',
+    text:'制造业数字化转型中，「工业互联网平台」的<strong>核心价值</strong>是？',
+    opts:[
+      '完全替代工厂工人，实现 100% 无人化智能生产',
+      '连接设备、数据与应用，打通各生产环节信息孤岛，支撑智能化运营决策',
+      '专门用于处理企业员工的薪酬与报销财务流程',
+      '仅适用于重型装备制造业，对消费电子制造没有适用价值'
+    ],
+    ans:1,
+    exp:'工业互联网平台的核心价值在于数据集成与应用使能。通过 OT（运营技术）与 IT 融合，打破设备、车间、工厂间的数据孤岛，支撑从设备监控、质检优化到供应链协同的全面智能化。'
+  },
+  {
+    id:9, type:'数字化转型',
+    text:'关于企业 AI 应用的「MVP（最小可行产品）」策略，以下说法<strong>正确</strong>的是？',
+    opts:[
+      'MVP 需包含所有规划功能，完善后才能发布，以免影响企业品牌形象',
+      'MVP 策略强调以最小资源快速验证核心价值假设，通过真实用户反馈指导迭代',
+      'MVP 策略只适用于 ToC 消费级产品，ToB 企业级场景必须一步到位',
+      '企业数字化建设属于基础设施，无需 MVP 验证，应直接全面部署'
+    ],
+    ans:1,
+    exp:'MVP（Minimum Viable Product）是精益创业方法论的核心，通过快速构建可验证核心假设的最小版本，以最低成本获取真实市场反馈，降低全量投入风险。这一方法在 ToB 场景（如联想内部数字化工具）同样高效。'
+  },
+  {
+    id:10, type:'数字化转型',
+    text:'联想海外业务数字化转型面临的<strong>特有挑战</strong>，以下描述最准确的是？',
+    opts:[
+      '海外市场对联想品牌认知度极低，数字化投入无法获得市场认可',
+      '不同国家的法规合规差异、文化多元化与基础设施成熟度悬殊，需要「全球标准架构＋本地化配置」的灵活策略',
+      '海外市场数字化需求明显低于中国市场，整体投资回报率不具吸引力',
+      '海外团队普遍缺乏技术能力，无法理解和使用数字化管理工具'
+    ],
+    ans:1,
+    exp:'跨国企业数字化转型的核心挑战是「全球一致性」与「本地灵活性」的平衡。联想需在统一数据标准和技术平台的基础上，适应欧盟 GDPR、印尼 PDPL、东南亚各国数据法规等差异化合规要求及不同市场的基础设施差异。'
+  }
+];
+
+let candidateName = '';
+let answers = new Array(10).fill(-1);
+let currentQ = 0;
+let startTime = 0;
+let timerInterval = null;
+let totalSecs = 20*60;
+let elapsed = 0;
+
+function checkName(){
+  const v = document.getElementById('nameInput').value.trim();
+  document.getElementById('startBtn').disabled = v.length < 2;
+}
+
+function startExam(){
+  candidateName = document.getElementById('nameInput').value.trim();
+  document.getElementById('welcomeScreen').classList.remove('active');
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  for(let i=0;i<10;i++){
+    const d = document.createElement('div');
+    d.className='dot';d.id=`dot${i}`;
+    d.onclick=(()=>{const qi=i;return()=>goToQ(qi)})();
+    dotsEl.appendChild(d);
+  }
+
+  document.getElementById('examScreen').style.display='flex';
+  document.getElementById('examScreen').style.flexDirection='column';
+
+  startTime = Date.now();
+  timerInterval = setInterval(tickTimer, 1000);
+  renderQ(0);
+}
+
+function tickTimer(){
+  elapsed = Math.floor((Date.now()-startTime)/1000);
+  const rem = totalSecs - elapsed;
+  if(rem<=0){clearInterval(timerInterval);submitExam();return;}
+  const m=Math.floor(rem/60), s=rem%60;
+  document.getElementById('timerVal').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  document.getElementById('timer').classList.toggle('warn', rem<=120);
+}
+
+function renderQ(i){
+  currentQ=i;
+  const q=questions[i];
+  document.getElementById('qNum').textContent=`Q${i+1}`;
+  document.getElementById('qType').textContent=q.type==='专业'?'⚡ 专业题':'🌐 数字化转型';
+  document.getElementById('qType').className=`q-type ${q.type==='专业'?'type-pro':'type-dt'}`;
+  document.getElementById('qText').innerHTML=q.text;
+
+  const opts=document.getElementById('options');
+  opts.innerHTML='';
+  const letters=['A','B','C','D'];
+  q.opts.forEach((o,oi)=>{
+    const div=document.createElement('div');
+    div.className=`option${answers[i]===oi?' selected':''}`;
+    div.onclick=()=>selectOpt(i,oi);
+    div.innerHTML=`<div class="opt-letter">${letters[oi]}</div><div class="opt-text">${o}</div>`;
+    opts.appendChild(div);
+  });
+
+  // progress
+  const answered=answers.filter(a=>a>=0).length;
+  document.getElementById('progText').textContent=`第 ${i+1} 题 / 共 10 题`;
+  document.getElementById('progPct').textContent=`${answered*10}%`;
+  document.getElementById('progressFill').style.width=`${answered*10}%`;
+
+  // dots
+  for(let j=0;j<10;j++){
+    const d=document.getElementById(`dot${j}`);
+    d.className=`dot${answers[j]>=0?' answered':''}${j===i?' current':''}`;
+  }
+
+  document.getElementById('prevBtn').style.visibility=i===0?'hidden':'visible';
+  document.getElementById('nextBtn').textContent=i===9?'提交 →':'下一题 →';
+  document.getElementById('nextBtn').onclick=i===9?showReview:nextQ;
+}
+
+function selectOpt(qi,oi){
+  answers[qi]=oi;
+  renderQ(qi);
+}
+
+function prevQ(){if(currentQ>0)renderQ(currentQ-1);}
+function nextQ(){if(currentQ<9)renderQ(currentQ+1);}
+function goToQ(i){renderQ(i);}
+
+function showReview(){
+  const answered=answers.filter(a=>a>=0).length;
+  document.getElementById('examScreen').style.display='none';
+  document.getElementById('reviewScreen').style.display='flex';
+  document.getElementById('reviewSub').textContent=`您已作答 ${answered}/10 题，请确认后提交。${answered<10?'⚠️ 还有 '+(10-answered)+' 题未作答！':'✅ 所有题目均已作答。'}`;
+
+  const rg=document.getElementById('reviewGrid');rg.innerHTML='';
+  for(let i=0;i<10;i++){
+    const d=document.createElement('div');
+    d.className=`rv-item${answers[i]>=0?' answered':''}`;
+    d.onclick=()=>{document.getElementById('reviewScreen').style.display='none';document.getElementById('examScreen').style.display='flex';document.getElementById('examScreen').style.flexDirection='column';renderQ(i);}
+    d.innerHTML=`<div class="rv-num">Q${i+1}</div><div class="rv-status">${answers[i]>=0?'✅':'⬜'}</div>`;
+    rg.appendChild(d);
+  }
+}
+
+function backToExam(){
+  document.getElementById('reviewScreen').style.display='none';
+  document.getElementById('examScreen').style.display='flex';
+  document.getElementById('examScreen').style.flexDirection='column';
+}
+
+function submitExam(){
+  clearInterval(timerInterval);
+  elapsed = Math.floor((Date.now()-startTime)/1000);
+
+  const score = answers.reduce((s,a,i)=>s+(a===questions[i].ans?1:0),0);
+  const mins=Math.floor(elapsed/60), secs=elapsed%60;
+  const timeStr=`⏱ 答题用时：${mins} 分 ${secs} 秒`;
+
+  // Build result object
+  const resultObj={
+    name:candidateName,
+    score,
+    total:10,
+    elapsed,
+    answers:[...answers],
+    timestamp:Date.now()
+  };
+  const code = btoa(encodeURIComponent(JSON.stringify(resultObj)));
+
+  // Save to localStorage
+  const key=`lenovo_exam_${Date.now()}`;
+  localStorage.setItem(key, JSON.stringify(resultObj));
+
+  // Show result
+  document.getElementById('reviewScreen').style.display='none';
+  document.getElementById('examScreen').style.display='none';
+  const rs=document.getElementById('resultScreen');
+  rs.style.display='flex';rs.style.flexDirection='column';rs.style.alignItems='center';
+
+  const pct=score/10;
+  let emoji='🎉',cls='excellent';
+  if(pct>=0.9){emoji='🏆';cls='excellent';}
+  else if(pct>=0.7){emoji='👍';cls='good';}
+  else if(pct>=0.5){emoji='📚';cls='average';}
+  else{emoji='💪';cls='poor';}
+
+  document.getElementById('resEmoji').textContent=emoji;
+  document.getElementById('resName').textContent=candidateName+' 的测评成绩';
+  const sc=document.getElementById('resScore');sc.textContent=score;sc.className=`result-score ${cls}`;
+  document.getElementById('resTime').textContent=timeStr;
+  document.getElementById('codeBox').textContent=code;
+}
+
+function copyCode(){
+  const code=document.getElementById('codeBox').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    const t=document.getElementById('copyToast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2500);
+  }).catch(()=>{
+    const el=document.getElementById('codeBox');
+    const range=document.createRange();range.selectNode(el);
+    window.getSelection().removeAllRanges();window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+  });
+}
+</script>
+</body>
+</html>
