@@ -127,6 +127,8 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;m
   <input type="text" name="total">
   <input type="text" name="elapsed">
   <input type="text" name="answers">
+  <input type="text" name="correct_answers">
+  <input type="text" name="q_labels">
   <input type="text" name="ts">
 </form>
 
@@ -1083,6 +1085,8 @@ function submitExam(){
       'total': '15',
       'elapsed': String(elapsed),
       'answers': JSON.stringify(answers),
+      'correct_answers': JSON.stringify(questions.map(q=>q.ans)),
+      'q_labels': JSON.stringify(questions.map((q,i)=>`Q${i+1} ${q.type==='专业'?'专业题':q.type==='定制题'?'定制题':q.type==='AI应用'?'AI应用题':'数字化转型'}`)),
       'ts': String(ts)
     })
   }).then(r=>{
