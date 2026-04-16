@@ -30,6 +30,9 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;m
 .name-label{font-size:14px;font-weight:600;color:#374151;margin-bottom:8px;display:block}
 .name-input{width:100%;padding:12px 16px;border:2px solid #e5e7eb;border-radius:10px;font-size:16px;font-family:inherit;outline:none;transition:.2s}
 .name-input:focus{border-color:#CC0000}
+.name-select{width:100%;padding:12px 16px;border:2px solid #e5e7eb;border-radius:10px;font-size:15px;font-family:inherit;outline:none;transition:.2s;background:#fff;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer}
+.name-select:focus{border-color:#CC0000}
+.error-msg{color:#CC0000;font-size:13px;margin-top:6px;display:none}
 .start-btn{width:100%;padding:14px;background:#CC0000;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s}
 .start-btn:hover{background:#a80000}
 .start-btn:disabled{background:#d1d5db;cursor:not-allowed}
@@ -53,6 +56,8 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;m
 .q-type{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:600}
 .type-pro{background:#fff0f0;color:#CC0000}
 .type-dt{background:#eff6ff;color:#1d4ed8}
+.type-custom{background:#f5f3ff;color:#6d28d9}
+.type-ai{background:#f0fdf4;color:#15803d}
 .q-text{font-size:17px;font-weight:600;color:#1a1a2e;line-height:1.7;margin-bottom:24px}
 .options{display:flex;flex-direction:column;gap:10px}
 .option{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border:2px solid #e5e7eb;border-radius:12px;cursor:pointer;transition:.2s;user-select:none}
@@ -69,7 +74,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;m
 .nav-next{background:#CC0000;color:#fff}
 .nav-next:hover{background:#a80000}
 .nav-next:disabled{background:#d1d5db;cursor:not-allowed}
-.q-dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:280px}
+.q-dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:320px}
 .dot{width:10px;height:10px;border-radius:50%;background:#e5e7eb;cursor:pointer;transition:.2s}
 .dot.answered{background:#CC0000}
 .dot.current{background:#1a1a2e;transform:scale(1.3)}
@@ -114,6 +119,17 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;m
 </head>
 <body>
 
+<!-- Netlify Forms 隐式声明（部署时 Netlify 自动识别） -->
+<form name="exam-results" data-netlify="true" hidden>
+  <input type="text" name="candidate_name">
+  <input type="text" name="candidate_id">
+  <input type="text" name="score">
+  <input type="text" name="total">
+  <input type="text" name="elapsed">
+  <input type="text" name="answers">
+  <input type="text" name="ts">
+</form>
+
 <header class="header">
   <div class="hd-text">
     <div class="co">在线测评系统</div>
@@ -126,17 +142,37 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;m
   <div class="welcome-box">
     <div class="welcome-icon">📋</div>
     <div class="welcome-title">实习生在线测评</div>
-    <div class="welcome-sub">本测评共10道单选题，涵盖专业知识与数字化转型两大模块，请独立完成作答。</div>
+    <div class="welcome-sub">本测评共15道单选题，涵盖专业知识、数字化转型及定制化专题，请独立完成作答。</div>
     <div class="info-grid">
-      <div class="info-item"><div class="info-label">题目数量</div><div class="info-val">10 道单选题</div></div>
-      <div class="info-item"><div class="info-label">建议时长</div><div class="info-val">20 分钟</div></div>
-      <div class="info-item"><div class="info-label">题目类型</div><div class="info-val">专业题 3 道</div></div>
-      <div class="info-item"><div class="info-label">题目类型</div><div class="info-val">数字化转型 7 道</div></div>
+      <div class="info-item"><div class="info-label">题目数量</div><div class="info-val">15 道单选题</div></div>
+      <div class="info-item"><div class="info-label">建议时长</div><div class="info-val">25 分钟</div></div>
+      <div class="info-item"><div class="info-label">通用题目</div><div class="info-val">专业题 3 道 + 转型题 7 道</div></div>
+      <div class="info-item"><div class="info-label">定制题目</div><div class="info-val">个人背景专题 5 道</div></div>
     </div>
     <div class="name-wrap">
-      <label class="name-label">请输入您的姓名</label>
-      <input class="name-input" id="nameInput" type="text" placeholder="例：张三" maxlength="20" oninput="checkName()">
+      <label class="name-label">请选择您的姓名</label>
+      <select class="name-select" id="candidateSelect" onchange="onCandidateChange()">
+        <option value="">-- 请选择您的姓名 --</option>
+        <option value="陈佳慧">陈佳慧</option>
+        <option value="林晓萱">林晓萱</option>
+        <option value="张明远">张明远</option>
+        <option value="刘雨桐">刘雨桐</option>
+        <option value="王子轩">王子轩</option>
+        <option value="赵思琪">赵思琪</option>
+        <option value="吴浩然">吴浩然</option>
+        <option value="郑欣怡">郑欣怡</option>
+        <option value="__custom__">姓名不在列表中，自行输入</option>
+      </select>
     </div>
+    <div class="name-wrap" id="customNameWrap" style="display:none">
+      <label class="name-label">请输入您的姓名</label>
+      <input class="name-input" id="customNameInput" type="text" placeholder="请输入您的姓名" maxlength="20" oninput="checkStart()">
+    </div>
+    <div class="name-wrap">
+      <label class="name-label">请输入手机号后 4 位</label>
+      <input class="name-input" id="phoneInput" type="text" maxlength="4" pattern="[0-9]{4}" placeholder="例：1234" oninput="checkStart()">
+    </div>
+    <div class="error-msg" id="errorMsg">手机号后4位不匹配，请核实</div>
     <button class="start-btn" id="startBtn" disabled onclick="startExam()">开始测评 →</button>
   </div>
 </div>
@@ -146,13 +182,13 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;m
   <div class="exam-topbar">
     <div class="progress-wrap">
       <div class="progress-info">
-        <span id="progText">第 1 题 / 共 10 题</span>
+        <span id="progText">第 1 题 / 共 15 题</span>
         <span id="progPct">0%</span>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
     </div>
     <div class="q-dots" id="dots"></div>
-    <div class="timer" id="timer"><span class="timer-icon">⏱</span><span id="timerVal">20:00</span></div>
+    <div class="timer" id="timer"><span class="timer-icon">⏱</span><span id="timerVal">25:00</span></div>
   </div>
   <div class="exam-body">
     <div class="q-card">
@@ -187,20 +223,19 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;m
     <div class="result-emoji" id="resEmoji"></div>
     <div class="result-name" id="resName"></div>
     <div class="result-score" id="resScore"></div>
-    <div class="result-total">/ 10 题</div>
+    <div class="result-total">/ 15 题</div>
     <div class="result-time" id="resTime"></div>
     <hr class="result-divider">
-    <div class="code-section">
-      <div class="code-label">📤 成绩码（发给考官）</div>
-      <div class="code-box" id="codeBox" onclick="copyCode()"></div>
-      <div class="copy-toast" id="copyToast">✓ 已复制到剪贴板</div>
-      <div class="code-note">请将以上成绩码通过微信 / 邮件发送给HR，考官将凭此码查看您的详细答题记录。</div>
+    <div id="submitStatus" style="text-align:center;padding:8px 0">
+      <div style="font-size:22px;margin-bottom:6px">⏳</div>
+      <div style="font-size:14px;color:#6b7280">正在提交成绩…</div>
     </div>
   </div>
 </div>
 
 <script>
-const questions = [
+// ── Base 10 questions ──
+const baseQuestions = [
   {
     id:1, type:'专业',
     text:'关于 RAG（检索增强生成）技术，以下描述<strong>正确</strong>的是？',
@@ -210,8 +245,7 @@ const questions = [
       'RAG 与模型微调（Fine-tuning）能完全互相替代，解决相同问题',
       '向量数据库存储的是文本的关键词索引，而非语义向量'
     ],
-    ans:1,
-    exp:'RAG 通过检索外部知识库为模型提供事实依据，有效减少幻觉。分块粒度需根据语义合理设计；向量数据库存储的是语义向量而非关键词；RAG 与 Fine-tuning 解决的是不同类型的问题（外部知识 vs. 内化能力）。'
+    ans:1
   },
   {
     id:2, type:'专业',
@@ -222,8 +256,7 @@ const questions = [
       '模型参数规模 ＋ GPU 算力消耗 ＋ 训练数据量',
       '页面加载速度 ＋ 界面美观度评分 ＋ 功能覆盖数量'
     ],
-    ans:1,
-    exp:'AI 客服的核心价值在于准确理解意图、解决用户问题并减少人工干预。意图识别准确率反映 AI 能力，问题解决率反映业务价值，人工转接率反映 AI 替代效果，三者共同构成核心评估体系。'
+    ans:1
   },
   {
     id:3, type:'专业',
@@ -234,8 +267,7 @@ const questions = [
       'Prompt 越长、细节越多，模型效果一定越好',
       '明确的角色设定（Role Prompting）可有效引导模型的输出风格与专业度'
     ],
-    ans:2,
-    exp:'Prompt 并非越长越好，过长的 Prompt 可能引入噪声或超出模型有效注意力范围。其余三项均为正确的 Prompt 工程原则。'
+    ans:2
   },
   {
     id:4, type:'数字化转型',
@@ -246,8 +278,7 @@ const questions = [
       '一次性将所有系统完整迁移至数字化平台，追求速度',
       '优先引进知名品牌的成熟商业软件，避免自研风险'
     ],
-    ans:1,
-    exp:'数字化转型本质是组织变革而非技术采购。麦肯锡等调研显示，70% 的转型失败源于组织能力不足和领导力缺失，而非技术本身。领导层承诺与变革管理是最关键的成功因素。'
+    ans:1
   },
   {
     id:5, type:'数字化转型',
@@ -258,8 +289,7 @@ const questions = [
       '将所有研发和制造业务迁移至海外低成本地区',
       '通过大规模并购竞争对手快速扩大全球市场份额'
     ],
-    ans:1,
-    exp:'联想 SSG 战略旨在从一次性硬件销售转向订阅制、按需付费的托管 IT 服务（TruScale）模式，提升收入可预测性和毛利率，是从 Product Company 向 Service Company 转型的典型路径。'
+    ans:1
   },
   {
     id:6, type:'数字化转型',
@@ -270,8 +300,7 @@ const questions = [
       '禁止企业使用任何 AI 算法自动分析用户行为数据',
       '强制要求企业所有数据分析人员通过欧盟官方认证考试'
     ],
-    ans:1,
-    exp:'GDPR 的核心是数据主体权利保护，包括知情权、访问权、更正权、删除权（被遗忘权）及数据可携带权，并要求企业在处理个人数据前获得明确合法依据。选项 A 的"强制本地化"并非 GDPR 本身的要求。'
+    ans:1
   },
   {
     id:7, type:'数字化转型',
@@ -282,8 +311,7 @@ const questions = [
       '部署数字孪生后，企业完全不再需要人工干预供应链决策',
       '数字孪生可通过仿真优化库存配置和多式联运路径规划'
     ],
-    ans:2,
-    exp:'数字孪生是辅助决策工具，而非替代人工判断。面对极端事件、战略决策或需要伦理考量的场景时，人工监督和干预仍不可或缺。其余三项均为数字孪生的真实价值体现。'
+    ans:2
   },
   {
     id:8, type:'数字化转型',
@@ -294,8 +322,7 @@ const questions = [
       '专门用于处理企业员工的薪酬与报销财务流程',
       '仅适用于重型装备制造业，对消费电子制造没有适用价值'
     ],
-    ans:1,
-    exp:'工业互联网平台的核心价值在于数据集成与应用使能。通过 OT（运营技术）与 IT 融合，打破设备、车间、工厂间的数据孤岛，支撑从设备监控、质检优化到供应链协同的全面智能化。'
+    ans:1
   },
   {
     id:9, type:'数字化转型',
@@ -306,8 +333,7 @@ const questions = [
       'MVP 策略只适用于 ToC 消费级产品，ToB 企业级场景必须一步到位',
       '企业数字化建设属于基础设施，无需 MVP 验证，应直接全面部署'
     ],
-    ans:1,
-    exp:'MVP（Minimum Viable Product）是精益创业方法论的核心，通过快速构建可验证核心假设的最小版本，以最低成本获取真实市场反馈，降低全量投入风险。这一方法在 ToB 场景（如联想内部数字化工具）同样高效。'
+    ans:1
   },
   {
     id:10, type:'数字化转型',
@@ -318,31 +344,608 @@ const questions = [
       '海外市场数字化需求明显低于中国市场，整体投资回报率不具吸引力',
       '海外团队普遍缺乏技术能力，无法理解和使用数字化管理工具'
     ],
-    ans:1,
-    exp:'跨国企业数字化转型的核心挑战是「全球一致性」与「本地灵活性」的平衡。联想需在统一数据标准和技术平台的基础上，适应欧盟 GDPR、印尼 PDPL、东南亚各国数据法规等差异化合规要求及不同市场的基础设施差异。'
+    ans:1
   }
 ];
 
+// ── Custom question sets ──
+const customQuestionSets = {
+  chenjiahui: [
+    {
+      type:'定制题',
+      text:'在跨国企业财务数字化中，ERP系统（如SAP）的「多币种自动对冲」功能主要解决什么问题？',
+      opts:[
+        '提升会计报表的视觉美观度',
+        '自动抵消因汇率波动导致的跨境交易外汇风险敞口',
+        '完全消除企业的市场价格风险',
+        '替代人工完成所有财务审批流程'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在国际贸易数据分析中，使用「回归分析」预测出口额时，最需要控制的变量是？',
+      opts:[
+        '出口商品的包装设计评分',
+        '目标市场GDP增速、汇率变动和关税税率',
+        '公司内部会议室的使用频率',
+        '销售团队的平均工龄'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'联想在欧洲市场向企业客户销售时，「发票保理（Invoice Factoring）」数字化的核心价值是？',
+      opts:[
+        '帮助美化财务报表数字',
+        '将应收账款提前变现，缩短现金循环周期，改善运营现金流',
+        '完全免除客户的付款义务',
+        '自动生成市场营销材料'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在金融数据分析中，Power BI与Excel的核心区别在于？',
+      opts:[
+        'Power BI只能处理小于1000行的数据集',
+        'Power BI支持多数据源实时连接与可视化协作，适合企业级BI场景',
+        'Excel比Power BI更适合构建实时数据仪表板',
+        '两者功能完全相同，无本质区别'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'跨国企业财务报告中「功能性货币」与「报告货币」不同时，哪项处理方式符合IAS 21准则？',
+      opts:[
+        '统一按年末汇率折算所有科目',
+        '资产负债表项目按资产负债表日汇率折算，损益表项目按交易日或平均汇率折算',
+        '所有科目均按历史汇率折算',
+        '只折算现金科目，其他科目保持原币不变'
+      ],
+      ans:1
+    }
+  ],
+  linxiaoxuan: [
+    {
+      type:'定制题',
+      text:'在制造业供应链数字化中，「需求驱动型补货（DDMRP）」相比传统MRP的核心优势是？',
+      opts:[
+        '完全消除了安全库存的需要',
+        '通过战略缓冲点管理，降低需求变异性对整条供应链的放大效应（牛鞭效应）',
+        '要求供应商每小时更新库存数据',
+        '专门适用于单品种大批量生产模式'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在精益生产中，「价值流图（VSM）」数字化后，最直接帮助识别的是？',
+      opts:[
+        '员工的工作满意度分布',
+        '生产流程中的非增值环节（浪费）和改善机会点',
+        '设备的外观老化程度',
+        '产品的市场定价策略'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'联想笔记本电脑的供应链采用「延迟差异化（Postponement）」策略，其含义是？',
+      opts:[
+        '延迟支付供应商货款以改善现金流',
+        '尽可能推迟产品差异化操作至靠近客户需求点，降低预测误差带来的库存积压风险',
+        '推迟产品上市时间以等待技术成熟',
+        '延迟更新ERP系统数据'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在SAP S/4HANA的生产计划模块中，「可用量检查（ATP）」的作用是？',
+      opts:[
+        '检查员工的出勤可用时间',
+        '在客户下单时实时验证库存、在途量和产能，给出准确的可承诺交货日期',
+        '自动生成财务折旧计划',
+        '监控数据库的存储空间使用率'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'制造业IoT数字化中，OEE（设备综合效率）的三个核心构成要素是？',
+      opts:[
+        '员工数量、工资水平、加班时长',
+        '可用率、性能率、质量率',
+        '原材料成本、能源消耗、废品率',
+        '订单数量、交货速度、客户满意度'
+      ],
+      ans:1
+    }
+  ],
+  zhangmingyuan: [
+    {
+      type:'定制题',
+      text:'在AI产品开发中，「A/B测试」和「多臂老虎机（Multi-armed Bandit）」算法的核心区别是？',
+      opts:[
+        'A/B测试只能测试两个版本，多臂老虎机可以测试无限版本',
+        '多臂老虎机在探索（Exploration）的同时动态调整流量分配以利用（Exploitation）已知较优方案，减少测试期损失',
+        '两者在统计原理上完全相同',
+        'A/B测试适用于机器学习，多臂老虎机适用于人工决策'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在NLP模型评估中，当正负样本极度不平衡时，最不适合单独使用的评估指标是？',
+      opts:[
+        'F1-Score',
+        'AUC-ROC',
+        'Accuracy（准确率）',
+        'Precision-Recall曲线下面积'
+      ],
+      ans:2
+    },
+    {
+      type:'定制题',
+      text:'联想AI产品（如AI PC的智能助理功能）在产品路线图中，「端侧推理」相比「云端推理」的核心优势是？',
+      opts:[
+        '端侧模型参数规模可以远超云端大模型',
+        '降低延迟、保护用户隐私、减少云服务依赖，在离线场景下仍可运行',
+        '端侧推理的计算成本始终低于云端',
+        '端侧模型不需要任何训练过程'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在机器学习工程化（MLOps）中，「特征存储（Feature Store）」的主要作用是？',
+      opts:[
+        '存储模型的权重文件和检查点',
+        '统一管理、复用和共享训练与推理时使用的特征，避免训练-服务偏差（Training-Serving Skew）',
+        '替代传统数据库存储所有业务数据',
+        '自动完成特征工程的所有步骤'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'作为AI产品经理，在评估是否将某传统业务流程替换为AI自动化时，哪个框架最为系统？',
+      opts:[
+        '直接问工程师技术上是否可行',
+        '从任务可结构化程度、数据可获得性、错误容忍度和ROI四个维度综合评估',
+        '参考竞争对手是否已经实现',
+        '只需评估技术成本'
+      ],
+      ans:1
+    }
+  ],
+  liuyutong: [
+    {
+      type:'定制题',
+      text:'联想进入新兴市场（如印尼）时，采用「渠道合作伙伴数字化赋能」平台的核心目的是？',
+      opts:[
+        '完全取代当地经销商以降低渠道成本',
+        '通过数字化工具提升经销商的销售能力和库存可见性，共同扩大市场份额',
+        '监控经销商的每日销售人员行踪',
+        '强制要求经销商使用联想指定的会计软件'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在国际业务谈判中，「文化维度理论」（霍夫斯泰德）中的「不确定性规避」高低，会如何影响数字化合同的接受度？',
+      opts:[
+        '高不确定性规避文化更倾向接受灵活的口头协议',
+        '高不确定性规避文化更需要详尽的合同条款、认证和标准化流程来建立信任',
+        '不确定性规避与数字化合同接受度无关',
+        '低不确定性规避文化更倾向使用传统纸质合同'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在SaaS业务模式下，「净收入留存率（NRR/Net Revenue Retention）」超过100%意味着？',
+      opts:[
+        '公司当期获客成本低于行业平均水平',
+        '现有客户的扩张收入（升级/增购）完全抵消了流失收入并实现净增长，无需新客也能增长',
+        '公司的毛利率超过100%',
+        '所有客户均未发生续约'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'联想海外B2B业务数字化中，「客户成功（Customer Success）」职能与传统售后服务的核心区别是？',
+      opts:[
+        '客户成功团队负责产品维修，售后服务负责商务关系',
+        '客户成功是主动的、以客户业务结果为导向的持续服务，驱动续约和扩张；传统售后是被动响应故障',
+        '两者职责完全相同，只是名称不同',
+        '客户成功只服务大客户，售后服务面向所有客户'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在国际市场开拓中，「GTM（Go-to-Market）策略」数字化的关键要素<strong>不包括</strong>？',
+      opts:[
+        '目标客户画像（ICP）和痛点分析',
+        '数字化销售漏斗与线索评分模型',
+        '竞争对手CEO的个人社交媒体分析',
+        '渠道组合策略和合作伙伴生态规划'
+      ],
+      ans:2
+    }
+  ],
+  wangzixuan: [
+    {
+      type:'定制题',
+      text:'在工业IoT架构中，「边缘计算（Edge Computing）」节点与云端的职责分工，以下描述最准确的是？',
+      opts:[
+        '边缘节点负责长期数据存储，云端负责实时控制',
+        '边缘节点负责本地实时处理和低延迟控制，云端负责全局分析、模型训练和跨站点协同',
+        '两者功能完全相同，仅部署位置不同',
+        '边缘计算只适用于视频监控场景'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'联想智能硬件产品（如ThinkPad）的固件OTA（空中升级）机制中，「A/B分区更新」的主要优势是？',
+      opts:[
+        '减少固件文件的存储占用',
+        '在后台静默下载并安装新固件至备用分区，更新失败可自动回滚，不影响用户使用',
+        '加快固件下载速度50%以上',
+        '允许用户自行修改固件代码'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在智能硬件产品的「端-边-云」协同架构中，数据从传感器采集到云端分析，延迟最低的处理层级是？',
+      opts:[
+        '公有云数据中心',
+        '企业私有云',
+        '端侧（设备本地处理器）',
+        '区域边缘节点'
+      ],
+      ans:2
+    },
+    {
+      type:'定制题',
+      text:'针对IoT设备的安全威胁，「零信任架构（Zero Trust）」在设备接入层的核心原则是？',
+      opts:[
+        '内网设备默认可信，只验证外网访问',
+        '任何设备无论位置均需持续验证身份和权限，最小化访问权限',
+        '使用强密码即可满足安全要求',
+        '物理隔离所有IoT设备与企业网络'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在硬件产品的「数字孪生」实现中，哪种数据对构建准确的设备健康预测模型最关键？',
+      opts:[
+        '产品的外观颜色和包装设计',
+        '设备运行时的振动、温度、电流等时序传感器数据及历史故障标签',
+        '产品发布时的新闻报道数量',
+        '用户的性别和年龄统计数据'
+      ],
+      ans:1
+    }
+  ],
+  zhaosiq: [
+    {
+      type:'定制题',
+      text:'东南亚数字经济中，「超级APP（Super App）」模式（如Grab、Gojek）对联想B2C数字营销的启示是？',
+      opts:[
+        '联想应立即收购一家东南亚超级APP',
+        '东南亚消费者高度依赖超级APP生态，联想营销需要深度整合当地主流平台而非依赖独立官网',
+        '超级APP只适合餐饮和打车行业，与电子产品无关',
+        '东南亚市场应完全复制中国微信生态的营销策略'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'越南《网络安全法》对跨国科技企业在越南开展业务的主要合规要求是？',
+      opts:[
+        '要求外资企业将越南用户数据和服务器100%本地化存储',
+        '要求在越南本地保存数据副本并在当地设立法人实体，且需配合政府数据调取请求',
+        '禁止外资企业向越南消费者销售任何数字产品',
+        '只要求企业网站提供越南语版本即可'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在东南亚B2B市场开发中，「关系型销售（Relationship Selling）」比「交易型销售」更重要的根本原因是？',
+      opts:[
+        '东南亚采购决策完全依靠个人情感而非商业逻辑',
+        '高权力距离和集体主义文化背景下，决策者更倾向信任和采购有长期关系的合作伙伴',
+        '交易型销售在东南亚是违法的',
+        '东南亚没有成熟的企业采购流程'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'联想在东南亚推进「渠道数字化」时，面对经销商数字化能力参差不齐，最有效的分层策略是？',
+      opts:[
+        '统一要求所有经销商在3个月内达到相同数字化水平',
+        '按经销商规模和能力分级，提供差异化的数字化工具包和阶梯式培训支持，逐步提升整体水平',
+        '淘汰所有不能立即适应数字化的经销商',
+        '只对最大的5家经销商进行数字化升级'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在跨文化商务沟通中，东南亚市场（尤其马来西亚、印尼）商务邮件的有效写作原则是？',
+      opts:[
+        '使用直接的批评性语言以显示专业严谨',
+        '采用礼貌间接的表达、先建立个人关系再推进业务，避免使对方「面子」受损',
+        '尽量减少客套语，只写核心业务内容',
+        '统一使用标准美式英语商务模板即可'
+      ],
+      ans:1
+    }
+  ],
+  wuhaoran: [
+    {
+      type:'定制题',
+      text:'在电商数据分析中，「同期群分析（Cohort Analysis）」的主要用途是？',
+      opts:[
+        '分析不同地区仓库的物流效率',
+        '追踪同一时期获取的用户群体在生命周期各阶段的行为变化，识别留存与流失规律',
+        '比较不同SKU的毛利率差异',
+        '预测下季度的广告投放预算'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在SQL中，以下哪种操作最适合计算每个品类「过去30天」的滚动销售额？',
+      opts:[
+        'GROUP BY + HAVING',
+        '窗口函数（Window Function）中的 ROWS BETWEEN 29 PRECEDING AND CURRENT ROW',
+        '子查询嵌套SELECT',
+        'CROSS JOIN笛卡尔积'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'联想电商运营中，「搜索词报告（Search Term Report）」数字化分析的核心价值是？',
+      opts:[
+        '监控竞争对手的广告投放金额',
+        '识别高转化关键词和无效搜索词，优化广告关键词策略和产品标题/详情页内容',
+        '分析页面的CSS样式渲染性能',
+        '计算仓库员工的工作效率'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在Tableau中，「LOD（详细级别）表达式」中 FIXED 和 INCLUDE 的核心区别是？',
+      opts:[
+        'FIXED计算速度更快，INCLUDE更精确',
+        'FIXED忽略视图中的维度筛选，按指定维度计算；INCLUDE在视图维度基础上增加指定维度进行计算',
+        '两者功能完全相同，仅语法不同',
+        'INCLUDE只能用于时间维度计算'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在电商「A/B测试」中，如果两组样本量不足就过早宣布测试结果，会导致什么统计问题？',
+      opts:[
+        '数据存储成本增加',
+        '「窥视问题（Peeking Problem）」，错误地将随机波动当作显著差异，导致假阳性结论',
+        '服务器响应时间变慢',
+        '用户体验评分下降'
+      ],
+      ans:1
+    }
+  ],
+  zhengxinyi: [
+    {
+      type:'定制题',
+      text:'在B端（企业级）产品的UX设计中，与C端产品最核心的区别在于？',
+      opts:[
+        'B端产品不需要任何视觉设计，只需功能堆砌',
+        'B端用户是被动使用（工作场景），需优先考虑效率、任务完成度和与既有工作流的整合，而非娱乐性',
+        'B端产品比C端产品的界面应该更复杂以显示专业',
+        'B端设计只需满足采购决策者的偏好，无需考虑实际使用者'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在联想企业级软件（如TruScale管理平台）的设计中，「可用性测试」最有价值的执行方式是？',
+      opts:[
+        '让设计师自己测试10遍，找出所有问题',
+        '招募与真实IT管理员画像匹配的测试用户，观察其完成典型任务时的行为路径和卡点',
+        '通过在线问卷收集用户对界面颜色的偏好',
+        '在产品发布后的第一年不进行任何测试'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在「设计系统（Design System）」的构建中，「原子设计（Atomic Design）」方法论的核心层级顺序是？',
+      opts:[
+        '页面 → 模板 → 组件 → 原子',
+        '原子（Atoms）→ 分子（Molecules）→ 有机体（Organisms）→ 模板 → 页面',
+        '线框图 → 原型 → 设计稿 → 开发',
+        '用户故事 → 流程图 → 组件库 → 视觉规范'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在工业设计背景下，「人机工程学（Ergonomics）」融入联想ThinkPad键盘设计的体现是？',
+      opts:[
+        '选择最流行的颜色配色方案',
+        '根据人手尺寸分布数据优化键位间距、键程深度和掌托角度，降低长期使用的疲劳感',
+        '使键盘重量最轻以降低物流成本',
+        '模仿竞争对手的外观设计'
+      ],
+      ans:1
+    },
+    {
+      type:'定制题',
+      text:'在数字化产品的「无障碍设计（Accessibility）」中，WCAG 2.1 AA级别要求颜色对比度至少达到？',
+      opts:[
+        '文本与背景色对比度至少 3:1',
+        '文本与背景色对比度至少 4.5:1（正常文本），大号文本至少 3:1',
+        '只需确保色盲用户能区分所有颜色',
+        '对比度标准由设计师自行决定，无强制要求'
+      ],
+      ans:1
+    }
+  ]
+};
+
+// ── Generic AI questions (for self-entered candidates) ──
+const genericAIQuestions = [
+  {
+    type:'AI应用',
+    text:'在企业AI应用中，「提示词注入攻击（Prompt Injection）」的主要安全风险是？',
+    opts:[
+      '使AI模型的响应速度下降50%',
+      '恶意用户通过构造特殊输入，绕过系统提示词的限制，使AI执行未授权操作或泄露敏感信息',
+      '导致服务器物理硬件损坏',
+      '自动删除训练数据集'
+    ],
+    ans:1
+  },
+  {
+    type:'AI应用',
+    text:'关于「大语言模型（LLM）」的「上下文窗口（Context Window）」，以下描述正确的是？',
+    opts:[
+      '上下文窗口越大，模型的回答一定越准确',
+      '上下文窗口定义了模型单次处理的最大token数量，超出部分将被截断或遗忘，影响长文档处理能力',
+      '上下文窗口只影响输入，不影响输出质量',
+      '所有LLM的上下文窗口大小相同'
+    ],
+    ans:1
+  },
+  {
+    type:'AI应用',
+    text:'「AI幻觉（Hallucination）」现象在企业级应用中最有效的缓解策略是？',
+    opts:[
+      '使用更大显存的GPU硬件',
+      '结合RAG检索增强，为模型提供可引用的事实依据，并在输出中要求引用来源',
+      '要求模型只使用四字成语回答',
+      '将模型的温度参数调至最高值'
+    ],
+    ans:1
+  },
+  {
+    type:'AI应用',
+    text:'在评估企业AI项目的商业价值时，「总拥有成本（TCO）」分析应包含哪些核心要素？',
+    opts:[
+      '只计算初始软件授权费用',
+      'API调用成本、数据标注费用、集成开发人力、运维监控和持续迭代优化的全生命周期成本',
+      '仅考虑GPU硬件采购价格',
+      '只统计项目立项到上线的费用'
+    ],
+    ans:1
+  },
+  {
+    type:'AI应用',
+    text:'「多模态AI（Multimodal AI）」在企业数字化中的典型应用场景是？',
+    opts:[
+      '仅用于生成社交媒体图片内容',
+      '同时理解文本、图像、表格和语音等多种数据形式，应用于质检图像分析、合同OCR解读、语音会议纪要等复杂业务场景',
+      '只能处理英文内容，不支持中文',
+      '多模态AI专门用于视频游戏开发'
+    ],
+    ans:1
+  }
+];
+
+// ── Candidate database ──
+const candidateDB = {
+  '陈佳慧': { phone: '3821', questionSet: 'chenjiahui' },
+  '林晓萱': { phone: '6047', questionSet: 'linxiaoxuan' },
+  '张明远': { phone: '9163', questionSet: 'zhangmingyuan' },
+  '刘雨桐': { phone: '2594', questionSet: 'liuyutong' },
+  '王子轩': { phone: '7438', questionSet: 'wangzixuan' },
+  '赵思琪': { phone: '5172', questionSet: 'zhaosiq' },
+  '吴浩然': { phone: '8306', questionSet: 'wuhaoran' },
+  '郑欣怡': { phone: '4615', questionSet: 'zhengxinyi' },
+};
+
+// ── State ──
 let candidateName = '';
-let answers = new Array(10).fill(-1);
+let candidateId = '';
+let questions = [];
+let answers = new Array(15).fill(-1);
 let currentQ = 0;
 let startTime = 0;
 let timerInterval = null;
-let totalSecs = 20*60;
+let totalSecs = 25*60;
 let elapsed = 0;
 
-function checkName(){
-  const v = document.getElementById('nameInput').value.trim();
-  document.getElementById('startBtn').disabled = v.length < 2;
+function onCandidateChange(){
+  const sel = document.getElementById('candidateSelect').value;
+  const customWrap = document.getElementById('customNameWrap');
+  customWrap.style.display = sel === '__custom__' ? 'block' : 'none';
+  document.getElementById('errorMsg').style.display = 'none';
+  checkStart();
+}
+
+function checkStart(){
+  const sel = document.getElementById('candidateSelect').value;
+  const phone = document.getElementById('phoneInput').value.trim();
+  let nameOk = false;
+  if(sel === '__custom__'){
+    const custom = document.getElementById('customNameInput').value.trim();
+    nameOk = custom.length >= 2;
+  } else {
+    nameOk = sel.length > 0;
+  }
+  const phoneOk = /^\d{4}$/.test(phone);
+  document.getElementById('startBtn').disabled = !(nameOk && phoneOk);
 }
 
 function startExam(){
-  candidateName = document.getElementById('nameInput').value.trim();
+  const sel = document.getElementById('candidateSelect').value;
+  const phone = document.getElementById('phoneInput').value.trim();
+  const errEl = document.getElementById('errorMsg');
+
+  let name = '';
+  let customQs = [];
+
+  if(sel === '__custom__'){
+    name = document.getElementById('customNameInput').value.trim();
+    candidateId = 'custom';
+    customQs = genericAIQuestions;
+  } else {
+    name = sel;
+    const record = candidateDB[sel];
+    if(record && phone !== record.phone){
+      errEl.style.display = 'block';
+      return;
+    }
+    errEl.style.display = 'none';
+    candidateId = record ? record.questionSet : 'unknown';
+    customQs = record ? customQuestionSets[record.questionSet] : genericAIQuestions;
+  }
+
+  candidateName = name;
+  questions = baseQuestions.concat(customQs);
+  answers = new Array(15).fill(-1);
+
   document.getElementById('welcomeScreen').classList.remove('active');
 
   // Build dots
   const dotsEl = document.getElementById('dots');
-  for(let i=0;i<10;i++){
+  dotsEl.innerHTML = '';
+  for(let i=0;i<15;i++){
     const d = document.createElement('div');
     d.className='dot';d.id=`dot${i}`;
     d.onclick=(()=>{const qi=i;return()=>goToQ(qi)})();
@@ -370,8 +973,16 @@ function renderQ(i){
   currentQ=i;
   const q=questions[i];
   document.getElementById('qNum').textContent=`Q${i+1}`;
-  document.getElementById('qType').textContent=q.type==='专业'?'⚡ 专业题':'🌐 数字化转型';
-  document.getElementById('qType').className=`q-type ${q.type==='专业'?'type-pro':'type-dt'}`;
+
+  document.getElementById('qType').textContent =
+    q.type==='专业' ? '⚡ 专业题' :
+    q.type==='定制题' ? '🎯 定制题' :
+    q.type==='AI应用' ? '🤖 AI应用' : '🌐 数字化转型';
+  document.getElementById('qType').className =
+    'q-type ' + (q.type==='专业' ? 'type-pro' :
+                 q.type==='定制题' ? 'type-custom' :
+                 q.type==='AI应用' ? 'type-ai' : 'type-dt');
+
   document.getElementById('qText').innerHTML=q.text;
 
   const opts=document.getElementById('options');
@@ -387,19 +998,19 @@ function renderQ(i){
 
   // progress
   const answered=answers.filter(a=>a>=0).length;
-  document.getElementById('progText').textContent=`第 ${i+1} 题 / 共 10 题`;
-  document.getElementById('progPct').textContent=`${answered*10}%`;
-  document.getElementById('progressFill').style.width=`${answered*10}%`;
+  document.getElementById('progText').textContent=`第 ${i+1} 题 / 共 15 题`;
+  document.getElementById('progPct').textContent=`${Math.round(answered/15*100)}%`;
+  document.getElementById('progressFill').style.width=`${answered/15*100}%`;
 
   // dots
-  for(let j=0;j<10;j++){
+  for(let j=0;j<15;j++){
     const d=document.getElementById(`dot${j}`);
     d.className=`dot${answers[j]>=0?' answered':''}${j===i?' current':''}`;
   }
 
   document.getElementById('prevBtn').style.visibility=i===0?'hidden':'visible';
-  document.getElementById('nextBtn').textContent=i===9?'提交 →':'下一题 →';
-  document.getElementById('nextBtn').onclick=i===9?showReview:nextQ;
+  document.getElementById('nextBtn').textContent=i===14?'提交 →':'下一题 →';
+  document.getElementById('nextBtn').onclick=i===14?showReview:nextQ;
 }
 
 function selectOpt(qi,oi){
@@ -408,17 +1019,17 @@ function selectOpt(qi,oi){
 }
 
 function prevQ(){if(currentQ>0)renderQ(currentQ-1);}
-function nextQ(){if(currentQ<9)renderQ(currentQ+1);}
+function nextQ(){if(currentQ<14)renderQ(currentQ+1);}
 function goToQ(i){renderQ(i);}
 
 function showReview(){
   const answered=answers.filter(a=>a>=0).length;
   document.getElementById('examScreen').style.display='none';
   document.getElementById('reviewScreen').style.display='flex';
-  document.getElementById('reviewSub').textContent=`您已作答 ${answered}/10 题，请确认后提交。${answered<10?'⚠️ 还有 '+(10-answered)+' 题未作答！':'✅ 所有题目均已作答。'}`;
+  document.getElementById('reviewSub').textContent=`您已作答 ${answered}/15 题，请确认后提交。${answered<15?'⚠️ 还有 '+(15-answered)+' 题未作答！':'✅ 所有题目均已作答。'}`;
 
   const rg=document.getElementById('reviewGrid');rg.innerHTML='';
-  for(let i=0;i<10;i++){
+  for(let i=0;i<15;i++){
     const d=document.createElement('div');
     d.className=`rv-item${answers[i]>=0?' answered':''}`;
     d.onclick=()=>{document.getElementById('reviewScreen').style.display='none';document.getElementById('examScreen').style.display='flex';document.getElementById('examScreen').style.flexDirection='column';renderQ(i);}
@@ -440,29 +1051,15 @@ function submitExam(){
   const score = answers.reduce((s,a,i)=>s+(a===questions[i].ans?1:0),0);
   const mins=Math.floor(elapsed/60), secs=elapsed%60;
   const timeStr=`⏱ 答题用时：${mins} 分 ${secs} 秒`;
+  const ts = Date.now();
 
-  // Build result object
-  const resultObj={
-    name:candidateName,
-    score,
-    total:10,
-    elapsed,
-    answers:[...answers],
-    timestamp:Date.now()
-  };
-  const code = btoa(encodeURIComponent(JSON.stringify(resultObj)));
-
-  // Save to localStorage
-  const key=`lenovo_exam_${Date.now()}`;
-  localStorage.setItem(key, JSON.stringify(resultObj));
-
-  // Show result
+  // Show result screen
   document.getElementById('reviewScreen').style.display='none';
   document.getElementById('examScreen').style.display='none';
   const rs=document.getElementById('resultScreen');
   rs.style.display='flex';rs.style.flexDirection='column';rs.style.alignItems='center';
 
-  const pct=score/10;
+  const pct=score/15;
   let emoji='🎉',cls='excellent';
   if(pct>=0.9){emoji='🏆';cls='excellent';}
   else if(pct>=0.7){emoji='👍';cls='good';}
@@ -473,21 +1070,29 @@ function submitExam(){
   document.getElementById('resName').textContent=candidateName+' 的测评成绩';
   const sc=document.getElementById('resScore');sc.textContent=score;sc.className=`result-score ${cls}`;
   document.getElementById('resTime').textContent=timeStr;
-  document.getElementById('codeBox').textContent=code;
-}
 
-function copyCode(){
-  const code=document.getElementById('codeBox').textContent;
-  navigator.clipboard.writeText(code).then(()=>{
-    const t=document.getElementById('copyToast');
-    t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2500);
+  // 自动提交到 Netlify Forms
+  fetch(window.location.pathname, {
+    method:'POST',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({
+      'form-name': 'exam-results',
+      'candidate_name': candidateName,
+      'candidate_id': candidateId,
+      'score': String(score),
+      'total': '15',
+      'elapsed': String(elapsed),
+      'answers': JSON.stringify(answers),
+      'ts': String(ts)
+    })
+  }).then(r=>{
+    document.getElementById('submitStatus').innerHTML = r.ok
+      ? `<div style="color:#16a34a;font-size:15px;font-weight:600">✅ 成绩已自动提交至考官系统</div>
+         <div style="font-size:12px;color:#9ca3af;margin-top:4px">无需任何额外操作，感谢您的参与</div>`
+      : `<div style="color:#d97706;font-size:13px">⚠️ 自动提交失败，请截图本页发给 HR</div>`;
   }).catch(()=>{
-    const el=document.getElementById('codeBox');
-    const range=document.createRange();range.selectNode(el);
-    window.getSelection().removeAllRanges();window.getSelection().addRange(range);
-    document.execCommand('copy');
-    window.getSelection().removeAllRanges();
+    document.getElementById('submitStatus').innerHTML =
+      `<div style="color:#d97706;font-size:13px">⚠️ 自动提交失败，请截图本页发给 HR</div>`;
   });
 }
 </script>
