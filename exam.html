@@ -1074,7 +1074,7 @@ function submitExam(){
   document.getElementById('resTime').textContent=timeStr;
 
   // 自动提交到 Netlify Forms
-  fetch(window.location.pathname, {
+  fetch('/', {
     method:'POST',
     headers:{'Content-Type':'application/x-www-form-urlencoded'},
     body: new URLSearchParams({
