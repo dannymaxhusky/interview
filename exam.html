@@ -115,6 +115,54 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f2f5;m
 .code-note{font-size:12px;color:#9ca3af;margin-top:8px;line-height:1.6}
 .copy-toast{display:none;background:#16a34a;color:#fff;font-size:13px;padding:6px 18px;border-radius:20px;margin-top:10px;text-align:center}
 .copy-toast.show{display:block}
+
+/* ── Mobile ── */
+@media(max-width:600px){
+  .header{padding:12px 16px}
+  .hd-text .co{font-size:15px}
+
+  /* Welcome */
+  .welcome-box{padding:28px 20px;border-radius:14px}
+  .welcome-icon{font-size:40px;margin-bottom:12px}
+  .welcome-title{font-size:21px}
+  .welcome-sub{font-size:13px;margin-bottom:20px}
+  .info-grid{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+  .info-item{padding:10px 12px}
+  .info-val{font-size:13px}
+
+  /* Topbar: stack progress + timer vertically, hide dots */
+  .exam-topbar{padding:10px 14px;flex-wrap:wrap;gap:8px}
+  .progress-wrap{max-width:100%;width:100%;order:1}
+  .q-dots{display:none}
+  .timer{font-size:18px;order:2;margin-left:auto}
+
+  /* Question card */
+  .exam-body{margin:16px auto;padding:0 12px}
+  .q-card{padding:20px 16px;border-radius:12px}
+  .q-text{font-size:15px;margin-bottom:18px}
+  .option{padding:12px 14px;gap:10px}
+  .opt-letter{width:26px;height:26px;font-size:12px}
+  .opt-text{font-size:13px}
+
+  /* Nav buttons: full width on mobile */
+  .q-nav{flex-direction:column-reverse;gap:10px;margin-top:20px}
+  .nav-btn{width:100%;padding:13px;font-size:15px;text-align:center}
+
+  /* Review */
+  #reviewScreen{padding:20px 12px}
+  .review-box{padding:22px 16px;border-radius:12px}
+  .review-title{font-size:18px}
+  .review-grid{grid-template-columns:repeat(5,1fr);gap:7px}
+  .rv-item{padding:10px 4px}
+  .rv-num{font-size:10px}
+  .rv-status{font-size:16px}
+
+  /* Result */
+  #resultScreen{padding:20px 12px}
+  .result-box{padding:28px 20px;border-radius:14px}
+  .result-score{font-size:52px}
+  .result-emoji{font-size:48px}
+}
 </style>
 </head>
 <body>
