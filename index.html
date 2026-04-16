@@ -119,6 +119,66 @@ a{text-decoration:none}
   .modal-body{grid-template-columns:1fr}
   .hd-text .sub{display:none}
 }
+
+/* ── Selection Mode ── */
+.select-mode .card { cursor: pointer; }
+.select-mode .card:hover { border-color: #3b82f6; }
+.card-checkbox { position:absolute;top:12px;left:12px;width:22px;height:22px;border-radius:6px;border:2px solid #d1d5db;background:#fff;display:none;align-items:center;justify-content:center;z-index:10;transition:.15s;pointer-events:none; }
+.select-mode .card-checkbox { display:flex; }
+.card.selected { border-color:#3b82f6; background:#f0f7ff; }
+.card.selected .card-checkbox { background:#3b82f6;border-color:#3b82f6;color:#fff; }
+
+/* ── Floating Action Bar ── */
+.sel-bar { position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;border-radius:50px;padding:14px 28px;display:none;align-items:center;gap:18px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:200;white-space:nowrap; }
+.sel-bar.on { display:flex; }
+.sel-count { font-size:15px;font-weight:600; }
+.sel-confirm { background:#3b82f6;color:#fff;border:none;border-radius:30px;padding:9px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s; }
+.sel-confirm:hover { background:#2563eb; }
+.sel-cancel { background:transparent;color:#9ca3af;border:none;font-size:13px;cursor:pointer;font-family:inherit; }
+.sel-cancel:hover { color:#fff; }
+
+/* ── Group Modal ── */
+.g-overlay { position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px); }
+.g-overlay.on { display:flex; }
+.g-modal { background:#fff;border-radius:18px;width:100%;max-width:500px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.2); }
+.g-title { font-size:20px;font-weight:800;margin-bottom:6px; }
+.g-sub { font-size:13px;color:#6b7280;margin-bottom:24px; }
+.g-field { margin-bottom:16px; }
+.g-label { font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;display:block; }
+.g-input { width:100%;padding:10px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:.2s; }
+.g-input:focus { border-color:#3b82f6; }
+.g-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+.g-radio-group { display:flex;gap:16px; }
+.g-radio { display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px; }
+.g-selected-names { display:flex;flex-wrap:wrap;gap:6px;margin-top:8px; }
+.g-name-chip { background:#eff6ff;color:#1d4ed8;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600; }
+.g-actions { display:flex;gap:10px;margin-top:24px; }
+.g-save { flex:1;padding:12px;background:#3b82f6;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s; }
+.g-save:hover { background:#2563eb; }
+.g-cancel { padding:12px 20px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit; }
+
+/* ── Groups Section ── */
+.groups-wrap { margin-bottom:50px; }
+.group-card { background:#fff;border-radius:14px;padding:20px 24px;margin-bottom:12px;box-shadow:0 1px 6px rgba(0,0,0,.06);border-left:4px solid #3b82f6;display:flex;align-items:center;gap:20px; }
+.gc-time { text-align:center;min-width:80px; }
+.gc-date { font-size:20px;font-weight:800;color:#1a1a2e; }
+.gc-time-str { font-size:12px;color:#6b7280;margin-top:2px; }
+.gc-format { font-size:11px;background:#eff6ff;color:#1d4ed8;border-radius:8px;padding:2px 8px;margin-top:4px;display:inline-block; }
+.gc-divider { width:1px;height:60px;background:#e5e7eb;flex-shrink:0; }
+.gc-info { flex:1; }
+.gc-name { font-size:16px;font-weight:700;margin-bottom:8px; }
+.gc-members { display:flex;flex-wrap:wrap;gap:6px; }
+.gc-chip { display:flex;align-items:center;gap:5px;background:#f9fafb;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600; }
+.gc-avatar { width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff; }
+.gc-actions { display:flex;gap:8px;flex-shrink:0; }
+.gc-edit { padding:7px 14px;background:#f3f4f6;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit; }
+.gc-edit:hover { background:#e5e7eb; }
+.gc-del { padding:7px 14px;background:#fee2e2;color:#CC0000;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit; }
+.gc-del:hover { background:#fecaca; }
+.gc-notes { font-size:12px;color:#9ca3af;margin-top:6px;font-style:italic; }
+
+/* ── Group indicator dot on candidate cards ── */
+.group-dot { position:absolute;bottom:12px;right:12px;font-size:10px;background:#3b82f6;color:#fff;border-radius:10px;padding:2px 7px;font-weight:600; }
 </style>
 </head>
 <body>
@@ -144,6 +204,7 @@ a{text-decoration:none}
     </div>
   </div>
   <nav class="hd-nav">
+    <button class="btn btn-ghost" id="selModeBtn" onclick="toggleSelectMode()">📅 创建面试分组</button>
     <a href="exam.html" class="btn btn-primary">📝 进入考试</a>
     <a href="results.html" class="btn btn-ghost">📊 考官后台</a>
   </nav>
@@ -162,6 +223,10 @@ a{text-decoration:none}
 <div class="main">
   <div class="sec-title">候选人多维能力评估 <span>点击卡片查看详情</span></div>
   <div class="grid" id="grid"></div>
+
+  <!-- Interview Groups Section -->
+  <div class="sec-title" id="groupsTitle" style="display:none">面试分组安排 <span id="groupsCount"></span></div>
+  <div class="groups-wrap" id="groupsWrap" style="display:none"></div>
 
   <div class="sec-title">分组讨论议题 <span>5个讨论主题 · 联想业务 / 数字化转型 / 金融科技</span></div>
   <div class="topics-wrap" id="topics"></div>
@@ -190,6 +255,55 @@ a{text-decoration:none}
       </div>
     </div>
     <div class="eval-box" id="mEval"></div>
+  </div>
+</div>
+
+<!-- Selection Action Bar -->
+<div class="sel-bar" id="selBar">
+  <span class="sel-count" id="selCount">已选 0 人</span>
+  <button class="sel-confirm" onclick="openGroupModal()">📅 创建分组</button>
+  <button class="sel-cancel" onclick="toggleSelectMode()">取消</button>
+</div>
+
+<!-- Group Modal -->
+<div class="g-overlay" id="gOverlay">
+  <div class="g-modal">
+    <div class="g-title">📅 创建面试分组</div>
+    <div class="g-sub" id="gSub"></div>
+    <div class="g-field">
+      <label class="g-label">分组名称</label>
+      <input class="g-input" id="gName" type="text" placeholder="例：第一批 · 产品方向">
+    </div>
+    <div class="g-row">
+      <div class="g-field">
+        <label class="g-label">面试日期</label>
+        <input class="g-input" id="gDate" type="date">
+      </div>
+      <div class="g-field">
+        <label class="g-label">面试时间</label>
+        <input class="g-input" id="gTime" type="time">
+      </div>
+    </div>
+    <div class="g-field">
+      <label class="g-label">面试形式</label>
+      <div class="g-radio-group">
+        <label class="g-radio"><input type="radio" name="gFormat" value="线上" checked> 线上</label>
+        <label class="g-radio"><input type="radio" name="gFormat" value="线下"> 线下</label>
+        <label class="g-radio"><input type="radio" name="gFormat" value="混合"> 混合</label>
+      </div>
+    </div>
+    <div class="g-field">
+      <label class="g-label">备注（可选）</label>
+      <textarea class="g-input" id="gNotes" rows="2" placeholder="面试地点、注意事项等…" style="resize:vertical"></textarea>
+    </div>
+    <div class="g-field">
+      <label class="g-label">已选候选人</label>
+      <div class="g-selected-names" id="gSelectedNames"></div>
+    </div>
+    <div class="g-actions">
+      <button class="g-cancel" onclick="closeGroupModal()">取消</button>
+      <button class="g-save" onclick="saveGroup()">保存分组 ✓</button>
+    </div>
   </div>
 </div>
 
@@ -338,53 +452,66 @@ const ranked = [...candidates].map((c,i)=>({...c,origIdx:i,avg:Math.round(Object
 
 const rankClass = ['rank-1','rank-2','rank-3','rank-other','rank-other','rank-other','rank-other','rank-other'];
 
-const grid = document.getElementById('grid');
-ranked.forEach((c, ri) => {
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.innerHTML = `
-    <div class="rank-badge ${rankClass[ri]}">#${ri+1}</div>
-    <div class="card-top">
-      <div class="avatar" style="background:${COLORS[c.origIdx]}">${c.avatar}</div>
-      <div class="cinfo">
-        <div class="cname">${c.name}</div>
-        <div class="cschool">${c.school}</div>
-        <div class="cdeg">${c.degree}</div>
-      </div>
-      <div class="cscore">
-        <div class="score-ring" style="background:linear-gradient(135deg,${COLORS[c.origIdx]},${COLORS[c.origIdx]}99)">
-          ${c.avg}<small>分</small>
+function renderCards() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  ranked.forEach((c, ri) => {
+    const groups = loadGroups();
+    const candidateGroups = groups.filter(g => g.members.includes(c.name));
+    const groupDot = candidateGroups.length ? `<div class="group-dot">📅 ${candidateGroups.map(g=>g.name).join(', ')}</div>` : '';
+    const isSelected = selectedCandidates.has(c.name);
+    const card = document.createElement('div');
+    card.className = 'card' + (isSelected ? ' selected' : '');
+    card.innerHTML = `
+      <div class="card-checkbox">✓</div>
+      <div class="rank-badge ${rankClass[ri]}">#${ri+1}</div>
+      <div class="card-top">
+        <div class="avatar" style="background:${COLORS[c.origIdx]}">${c.avatar}</div>
+        <div class="cinfo">
+          <div class="cname">${c.name}</div>
+          <div class="cschool">${c.school}</div>
+          <div class="cdeg">${c.degree}</div>
+        </div>
+        <div class="cscore">
+          <div class="score-ring" style="background:linear-gradient(135deg,${COLORS[c.origIdx]},${COLORS[c.origIdx]}99)">
+            ${c.avg}<small>分</small>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="chart-wrap"><canvas id="cc${c.origIdx}"></canvas></div>
-    <div class="card-tags">
-      ${c.tags.map((t,ti)=>`<span class="tag${ti===0?' tag-red':''}">${t}</span>`).join('')}
-    </div>`;
-  card.onclick = () => openModal(c.origIdx);
-  grid.appendChild(card);
+      <div class="chart-wrap"><canvas id="cc${c.origIdx}"></canvas></div>
+      <div class="card-tags">
+        ${c.tags.map((t,ti)=>`<span class="tag${ti===0?' tag-red':''}">${t}</span>`).join('')}
+      </div>
+      ${groupDot}`;
+    card.onclick = (e) => selectMode ? toggleCardSelect(c.name, e) : openModal(c.origIdx);
+    grid.appendChild(card);
 
-  setTimeout(()=>{
-    new Chart(document.getElementById(`cc${c.origIdx}`).getContext('2d'),{
-      type:'radar',
-      data:{
-        labels:DIM_LABELS,
-        datasets:[{
-          data:DIM_KEYS.map(k=>c.scores[k]),
-          backgroundColor:COLORS[c.origIdx]+'22',
-          borderColor:COLORS[c.origIdx],
-          pointBackgroundColor:COLORS[c.origIdx],
-          borderWidth:2,pointRadius:3
-        }]
-      },
-      options:{
-        responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false}},
-        scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:'#e9ecef'},pointLabels:{font:{size:9.5},color:'#6b7280'}}}
-      }
-    });
-  },80*(ri+1));
-});
+    setTimeout(()=>{
+      const canvas = document.getElementById(`cc${c.origIdx}`);
+      if (!canvas) return;
+      new Chart(canvas.getContext('2d'),{
+        type:'radar',
+        data:{
+          labels:DIM_LABELS,
+          datasets:[{
+            data:DIM_KEYS.map(k=>c.scores[k]),
+            backgroundColor:COLORS[c.origIdx]+'22',
+            borderColor:COLORS[c.origIdx],
+            pointBackgroundColor:COLORS[c.origIdx],
+            borderWidth:2,pointRadius:3
+          }]
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false}},
+          scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},grid:{color:'#e9ecef'},pointLabels:{font:{size:9.5},color:'#6b7280'}}}
+        }
+      });
+    },80*(ri+1));
+  });
+}
+
+renderCards();
 
 // Topics
 const topics = [
@@ -509,6 +636,172 @@ function openModal(origIdx){
 }
 function closeModal(){document.getElementById('overlay').classList.remove('on');}
 document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
+
+// ── Interview Groups ──
+const GROUPS_KEY = 'interview_groups_v1';
+let selectMode = false;
+let selectedCandidates = new Set(); // stores candidate names
+let editingGroupId = null;
+
+function loadGroups() {
+  try { return JSON.parse(localStorage.getItem(GROUPS_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function saveGroups(groups) {
+  localStorage.setItem(GROUPS_KEY, JSON.stringify(groups));
+}
+
+function toggleSelectMode() {
+  selectMode = !selectMode;
+  selectedCandidates.clear();
+  document.body.classList.toggle('select-mode', selectMode);
+  document.getElementById('selModeBtn').textContent = selectMode ? '✕ 退出选择' : '📅 创建面试分组';
+  document.getElementById('selBar').classList.toggle('on', selectMode);
+  updateSelBar();
+  renderCards();
+}
+
+function updateSelBar() {
+  const n = selectedCandidates.size;
+  document.getElementById('selCount').textContent = `已选 ${n} 人`;
+  document.querySelector('.sel-confirm').disabled = n === 0;
+}
+
+function toggleCardSelect(name, e) {
+  if (!selectMode) return;
+  e.stopPropagation();
+  if (selectedCandidates.has(name)) {
+    selectedCandidates.delete(name);
+  } else {
+    selectedCandidates.add(name);
+  }
+  updateSelBar();
+  renderCards();
+}
+
+function openGroupModal(groupId = null) {
+  editingGroupId = groupId;
+  const modal = document.getElementById('gOverlay');
+
+  if (groupId !== null) {
+    const groups = loadGroups();
+    const g = groups.find(x => x.id === groupId);
+    if (!g) return;
+    document.querySelector('.g-title').textContent = '✏️ 编辑面试分组';
+    document.getElementById('gName').value = g.name;
+    document.getElementById('gDate').value = g.date;
+    document.getElementById('gTime').value = g.time;
+    document.querySelector(`input[name="gFormat"][value="${g.format}"]`).checked = true;
+    document.getElementById('gNotes').value = g.notes || '';
+    selectedCandidates = new Set(g.members);
+  } else {
+    document.querySelector('.g-title').textContent = '📅 创建面试分组';
+    document.getElementById('gName').value = '';
+    document.getElementById('gDate').value = '';
+    document.getElementById('gTime').value = '';
+    document.querySelector('input[name="gFormat"][value="线上"]').checked = true;
+    document.getElementById('gNotes').value = '';
+  }
+
+  const namesEl = document.getElementById('gSelectedNames');
+  namesEl.innerHTML = [...selectedCandidates].map(n =>
+    `<span class="g-name-chip">${n}</span>`
+  ).join('');
+  document.getElementById('gSub').textContent = `${selectedCandidates.size} 位候选人将加入此分组`;
+
+  modal.classList.add('on');
+}
+
+function closeGroupModal() {
+  document.getElementById('gOverlay').classList.remove('on');
+}
+
+function saveGroup() {
+  const name = document.getElementById('gName').value.trim();
+  const date = document.getElementById('gDate').value;
+  const time = document.getElementById('gTime').value;
+  const format = document.querySelector('input[name="gFormat"]:checked').value;
+  const notes = document.getElementById('gNotes').value.trim();
+
+  if (!name) { alert('请填写分组名称'); return; }
+  if (!date) { alert('请选择面试日期'); return; }
+  if (selectedCandidates.size === 0) { alert('请至少选择一位候选人'); return; }
+
+  const groups = loadGroups();
+  if (editingGroupId !== null) {
+    const idx = groups.findIndex(g => g.id === editingGroupId);
+    if (idx >= 0) groups[idx] = { ...groups[idx], name, date, time, format, notes, members: [...selectedCandidates] };
+  } else {
+    groups.push({ id: Date.now(), name, date, time, format, notes, members: [...selectedCandidates] });
+  }
+  saveGroups(groups);
+  closeGroupModal();
+  if (selectMode) toggleSelectMode(); else renderCards();
+  renderGroups();
+}
+
+function deleteGroup(id) {
+  if (!confirm('确认删除此分组？')) return;
+  const groups = loadGroups().filter(g => g.id !== id);
+  saveGroups(groups);
+  renderGroups();
+  renderCards();
+}
+
+function renderGroups() {
+  const groups = loadGroups();
+  const wrap = document.getElementById('groupsWrap');
+  const titleEl = document.getElementById('groupsTitle');
+  const countEl = document.getElementById('groupsCount');
+
+  if (!groups.length) {
+    wrap.style.display = 'none';
+    titleEl.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  titleEl.style.display = 'flex';
+  countEl.textContent = `${groups.length} 个分组`;
+
+  groups.sort((a, b) => (a.date + a.time) > (b.date + b.time) ? 1 : -1);
+
+  wrap.innerHTML = groups.map(g => {
+    const dateObj = g.date ? new Date(g.date + 'T00:00:00') : null;
+    const dateStr = dateObj ? `${dateObj.getMonth()+1}月${dateObj.getDate()}日` : '待定';
+    const dayStr = dateObj ? ['日','一','二','三','四','五','六'][dateObj.getDay()] : '';
+    const timeStr = g.time || '时间待定';
+
+    const memberChips = g.members.map(name => {
+      const c = candidates.find(x => x.name === name);
+      const color = c ? COLORS[candidates.indexOf(c) % COLORS.length] : '#6b7280';
+      const avatar = c ? c.avatar : name[0];
+      return `<div class="gc-chip">
+        <div class="gc-avatar" style="background:${color}">${avatar}</div>
+        ${name}
+      </div>`;
+    }).join('');
+
+    return `<div class="group-card">
+      <div class="gc-time">
+        <div class="gc-date">${dateStr}</div>
+        <div class="gc-time-str">周${dayStr} ${timeStr}</div>
+        <div class="gc-format">${g.format}</div>
+      </div>
+      <div class="gc-divider"></div>
+      <div class="gc-info">
+        <div class="gc-name">${g.name} · ${g.members.length}人</div>
+        <div class="gc-members">${memberChips}</div>
+        ${g.notes ? `<div class="gc-notes">📝 ${g.notes}</div>` : ''}
+      </div>
+      <div class="gc-actions">
+        <button class="gc-edit" onclick="openGroupModal(${g.id})">编辑</button>
+        <button class="gc-del" onclick="deleteGroup(${g.id})">删除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+renderGroups();
 </script>
 </body>
 </html>
