@@ -511,7 +511,140 @@ function renderCards() {
   });
 }
 
+// ── Interview Groups ──
+const GROUPS_KEY = 'interview_groups_v1';
+let selectMode = false;
+let selectedCandidates = new Set();
+let editingGroupId = null;
+
+function loadGroups(){
+  try{ return JSON.parse(localStorage.getItem(GROUPS_KEY)||'[]'); }catch(e){ return []; }
+}
+function saveGroups(groups){ localStorage.setItem(GROUPS_KEY, JSON.stringify(groups)); }
+
+function toggleSelectMode(){
+  selectMode = !selectMode;
+  selectedCandidates.clear();
+  document.body.classList.toggle('select-mode', selectMode);
+  document.getElementById('selModeBtn').textContent = selectMode ? '✕ 退出选择' : '📅 创建面试分组';
+  document.getElementById('selBar').classList.toggle('on', selectMode);
+  updateSelBar();
+  renderCards();
+}
+
+function updateSelBar(){
+  const n = selectedCandidates.size;
+  document.getElementById('selCount').textContent = `已选 ${n} 人`;
+  document.querySelector('.sel-confirm').disabled = n === 0;
+}
+
+function toggleCardSelect(name, e){
+  if(!selectMode) return;
+  e.stopPropagation();
+  if(selectedCandidates.has(name)) selectedCandidates.delete(name);
+  else selectedCandidates.add(name);
+  updateSelBar();
+  renderCards();
+}
+
+function openGroupModal(groupId){
+  editingGroupId = groupId || null;
+  if(groupId){
+    const g = loadGroups().find(x=>x.id===groupId);
+    if(!g) return;
+    document.querySelector('.g-title').textContent = '✏️ 编辑面试分组';
+    document.getElementById('gName').value = g.name;
+    document.getElementById('gDate').value = g.date;
+    document.getElementById('gTime').value = g.time||'';
+    const fmt = document.querySelector(`input[name="gFormat"][value="${g.format}"]`);
+    if(fmt) fmt.checked = true;
+    document.getElementById('gNotes').value = g.notes||'';
+    selectedCandidates = new Set(g.members);
+  } else {
+    document.querySelector('.g-title').textContent = '📅 创建面试分组';
+    document.getElementById('gName').value = '';
+    document.getElementById('gDate').value = '';
+    document.getElementById('gTime').value = '';
+    document.querySelector('input[name="gFormat"][value="线上"]').checked = true;
+    document.getElementById('gNotes').value = '';
+  }
+  document.getElementById('gSelectedNames').innerHTML = [...selectedCandidates].map(n=>`<span class="g-name-chip">${n}</span>`).join('');
+  document.getElementById('gSub').textContent = `${selectedCandidates.size} 位候选人将加入此分组`;
+  document.getElementById('gOverlay').classList.add('on');
+}
+
+function closeGroupModal(){ document.getElementById('gOverlay').classList.remove('on'); }
+
+function saveGroup(){
+  const name = document.getElementById('gName').value.trim();
+  const date = document.getElementById('gDate').value;
+  const time = document.getElementById('gTime').value;
+  const format = document.querySelector('input[name="gFormat"]:checked').value;
+  const notes = document.getElementById('gNotes').value.trim();
+  if(!name){ alert('请填写分组名称'); return; }
+  if(!date){ alert('请选择面试日期'); return; }
+  if(selectedCandidates.size===0){ alert('请至少选择一位候选人'); return; }
+  const groups = loadGroups();
+  if(editingGroupId){
+    const idx = groups.findIndex(g=>g.id===editingGroupId);
+    if(idx>=0) groups[idx] = {...groups[idx], name, date, time, format, notes, members:[...selectedCandidates]};
+  } else {
+    groups.push({id:Date.now(), name, date, time, format, notes, members:[...selectedCandidates]});
+  }
+  saveGroups(groups);
+  closeGroupModal();
+  if(selectMode) toggleSelectMode(); else renderCards();
+  renderGroups();
+}
+
+function deleteGroup(id){
+  if(!confirm('确认删除此分组？')) return;
+  saveGroups(loadGroups().filter(g=>g.id!==id));
+  renderGroups(); renderCards();
+}
+
+function renderGroups(){
+  const groups = loadGroups();
+  const wrap = document.getElementById('groupsWrap');
+  const titleEl = document.getElementById('groupsTitle');
+  const countEl = document.getElementById('groupsCount');
+  if(!groups.length){ wrap.style.display='none'; titleEl.style.display='none'; return; }
+  wrap.style.display='block'; titleEl.style.display='flex';
+  countEl.textContent = `${groups.length} 个分组`;
+  const sorted = [...groups].sort((a,b)=>(a.date+a.time)>(b.date+b.time)?1:-1);
+  wrap.innerHTML = sorted.map(g=>{
+    const dateObj = g.date ? new Date(g.date+'T00:00:00') : null;
+    const dateStr = dateObj ? `${dateObj.getMonth()+1}月${dateObj.getDate()}日` : '待定';
+    const dayStr = dateObj ? ['日','一','二','三','四','五','六'][dateObj.getDay()] : '';
+    const timeStr = g.time||'时间待定';
+    const chips = g.members.map(name=>{
+      const c = candidates.find(x=>x.name===name);
+      const color = c ? COLORS[candidates.indexOf(c)%COLORS.length] : '#6b7280';
+      const av = c ? c.avatar : name[0];
+      return `<div class="gc-chip"><div class="gc-avatar" style="background:${color}">${av}</div>${name}</div>`;
+    }).join('');
+    return `<div class="group-card">
+      <div class="gc-time">
+        <div class="gc-date">${dateStr}</div>
+        <div class="gc-time-str">周${dayStr} ${timeStr}</div>
+        <div class="gc-format">${g.format}</div>
+      </div>
+      <div class="gc-divider"></div>
+      <div class="gc-info">
+        <div class="gc-name">${g.name} · ${g.members.length}人</div>
+        <div class="gc-members">${chips}</div>
+        ${g.notes?`<div class="gc-notes">📝 ${g.notes}</div>`:''}
+      </div>
+      <div class="gc-actions">
+        <button class="gc-edit" onclick="openGroupModal(${g.id})">编辑</button>
+        <button class="gc-del" onclick="deleteGroup(${g.id})">删除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 renderCards();
+renderGroups();
 
 // Topics — 3 difficulty levels × 3 questions each
 const topicLevels = [
