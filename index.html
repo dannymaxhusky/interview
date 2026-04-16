@@ -216,7 +216,7 @@ a{text-decoration:none}
   <div class="stat"><div class="stat-n">78.6</div><div class="stat-l">平均综合评分</div></div>
   <div class="stat"><div class="stat-n">6</div><div class="stat-l">评估维度</div></div>
   <div class="stat"><div class="stat-n">10</div><div class="stat-l">在线考题</div></div>
-  <div class="stat"><div class="stat-n">5</div><div class="stat-l">分组讨论议题</div></div>
+  <div class="stat"><div class="stat-n">9</div><div class="stat-l">分组讨论议题</div></div>
   <div class="stat"><div class="stat-n">3</div><div class="stat-l">海外顶尖院校</div></div>
 </div>
 
@@ -228,7 +228,7 @@ a{text-decoration:none}
   <div class="sec-title" id="groupsTitle" style="display:none">面试分组安排 <span id="groupsCount"></span></div>
   <div class="groups-wrap" id="groupsWrap" style="display:none"></div>
 
-  <div class="sec-title">分组讨论议题 <span>5个讨论主题 · 联想业务 / 数字化转型 / 金融科技</span></div>
+  <div class="sec-title">分组讨论议题 <span>简单 / 中等 / 复杂 · 海外金融业务 / 企业AI落地 / 顾问方案设计</span></div>
   <div class="topics-wrap" id="topics"></div>
 </div>
 
@@ -513,81 +513,105 @@ function renderCards() {
 
 renderCards();
 
-// Topics
-const topics = [
+// Topics — 3 difficulty levels × 3 questions each
+const topicLevels = [
   {
-    n:1,title:'联想如何通过数字化重构东南亚市场售后服务体系？',
-    tags:['数字化运营','新兴市场','客户体验'],
-    desc:'东南亚市场分散、基础设施参差不齐，联想如何利用AI预测性维护、IoT设备监控和本地化服务数字平台，在降低运营成本的同时大幅提升客户NPS？',
-    pts:[
-      '预测性维护（Predictive Maintenance）vs. 传统被动响应模式的成本收益分析',
-      '本地合规要求（如印尼PDPL个人数据保护法）对售后数据共享与平台架构的影响',
-      '如何建立轻量化、可复制的「数字化服务站点」模型赋能本地经销商网络',
-      '通过数据驱动的SLA（服务等级协议）管理提升客户续约率与忠诚度'
+    level:'🟢 简单',
+    color:'#16a34a',
+    bg:'#f0fdf4',
+    desc:'适合作为破冰或热身讨论，考察基础认知与表达能力',
+    items:[
+      {
+        title:'你认为企业在海外市场开展业务时，最常遇到的挑战是什么？',
+        theme:'海外金融业务',
+        hint:'引导候选人从语言、法规、文化、支付等角度思考，无标准答案，重点观察思路是否清晰。'
+      },
+      {
+        title:'如果让你向一位完全不懂技术的客户解释「AI可以帮助你们公司做什么」，你会怎么说？',
+        theme:'企业AI落地',
+        hint:'考察候选人是否能将技术概念翻译成业务语言，能否举出贴近生活的例子。'
+      },
+      {
+        title:'假设客户问你「你们的方案和竞争对手有什么不同」，你会从哪几个角度来回答？',
+        theme:'顾问服务方案设计',
+        hint:'观察候选人是否有基本的竞争分析思维，如功能、价格、服务、行业经验等维度。'
+      }
     ]
   },
   {
-    n:2,title:'全球供应链重构背景下，联想如何用数字孪生提升韧性？',
-    tags:['供应链数字化','数字孪生','风险管理'],
-    desc:'后疫情时代地缘政治风险与贸易壁垒加剧，联想作为全球最大PC制造商，如何用数字孪生技术实现供应链可视化、仿真压测和快速切换应急方案？',
-    pts:[
-      '数字孪生平台如何整合多级供应商数据（Tier 1/2/3）实现全链条端到端可见性',
-      'AI需求预测模型在跨区域库存调配中的实际落地挑战与精度权衡',
-      '供应链数字化如何平衡数据安全合规（不同国家数据本地化要求）与共享效率',
-      '与HP、Dell相比，联想供应链数字化的差异化路径与竞争优势'
+    level:'🟡 中等',
+    color:'#d97706',
+    bg:'#fffbeb',
+    desc:'考察候选人能否结合具体场景进行结构化分析',
+    items:[
+      {
+        title:'东南亚很多中小企业没有银行账户，如果你负责帮助一家公司进入该市场做B2B销售，收款方案你会怎么设计？',
+        theme:'海外金融业务',
+        hint:'考察对新兴市场支付生态的了解（如GoPay、GrabPay、数字钱包），以及风控意识。'
+      },
+      {
+        title:'一家传统制造企业说「我们尝试过AI，但员工不愿意用」，作为顾问你会如何帮他们分析原因并给出建议？',
+        theme:'企业AI落地',
+        hint:'重点观察候选人是否能从人、流程、工具三个维度拆解问题，而不是直接给技术解决方案。'
+      },
+      {
+        title:'客户有预算、有需求，但决策周期已经拖了6个月。你作为项目负责人，会采取哪些行动推动项目落地？',
+        theme:'顾问服务方案设计',
+        hint:'考察项目推进能力与利益相关方管理，观察候选人是否能识别决策卡点并提出具体行动。'
+      }
     ]
   },
   {
-    n:3,title:'联想B2B业务数字化：从「卖硬件」到「卖解决方案」的转型路径',
-    tags:['B2B数字化','服务化转型','客户成功'],
-    desc:'联想SSG（智慧服务集团）是其服务化转型的核心引擎。在海外B2B市场，数字化如何支撑从一次性产品交易向多年期托管服务合同的商业模式演进？',
-    pts:[
-      'TruScale（设备即服务/按需付费）模式在不同成熟度市场的落地差异与推进策略',
-      'Customer Success Management（客户成功管理）体系如何通过数据预警降低客户流失率',
-      'AI辅助方案报价系统：如何将非标定制需求快速转化为可交付的结构化方案',
-      '海外政企客户对数据主权的高度敏感性如何影响公有云服务销售策略'
-    ]
-  },
-  {
-    n:4,title:'金融科技崛起如何重塑联想海外B2B采购与融资模式？',
-    tags:['金融科技','嵌入式金融','跨境支付'],
-    desc:'在新兴市场传统银行渗透率低，数字支付与BNPL（先买后付）高速增长。联想如何借助嵌入式金融工具，降低海外中小企业客户采购门槛并扩大市场份额？',
-    pts:[
-      '嵌入式金融（Embedded Finance）如何整合进联想B2B电商/渠道销售平台的技术架构',
-      '跨境支付数字化（多币种结算、汇率风险对冲）对运营成本与客户体验的双重影响',
-      'BNPL与企业融资租赁模式的适用场景对比：哪类市场适合哪种模式？',
-      '利用交易行为数据为无信用历史的中小企业（SME）构建动态授信模型'
-    ]
-  },
-  {
-    n:5,title:'AI Agent在联想海外内部运营中的落地边界与企业治理挑战',
-    tags:['AI Agent','企业治理','人机协作'],
-    desc:'随着AI Agent技术日趋成熟，联想海外运营的哪些场景（客服、报价、合规审查、HR）最适合引入自主AI？如何在提效的同时规避风险、保障合规？',
-    pts:[
-      '优先自动化场景识别：技术支持工单分类、RFQ报价生成、合规文档审查的投入产出比',
-      '不同国家劳工法规对AI替代人工岗位的限制以及内部沟通变革管理策略',
-      'AI决策可解释性（Explainability）在金融审批、法务合规场景的监管要求',
-      '企业级AI治理框架设计：模型审计机制、偏见检测、人工兜底与责任归属'
+    level:'🔴 复杂',
+    color:'#CC0000',
+    bg:'#fff8f8',
+    desc:'考察候选人在模糊信息和多方约束下的综合判断能力',
+    items:[
+      {
+        title:'一家跨国公司想在印度、印尼、越南三个市场同时推出企业数字贷款服务，但三国法规完全不同。如果你来设计这个项目的优先级与落地策略，你会怎么做？',
+        theme:'海外金融业务',
+        hint:'考察市场优先级框架（市场规模×法规友好度×竞争烈度），以及候选人能否承认信息不足并提出验证假设的方法。'
+      },
+      {
+        title:'你的团队用3个月开发了一套AI客服系统，上线后客户满意度不升反降。数据显示解决率从60%升到75%，但NPS下降了10分。你怎么看这个结果，接下来怎么做？',
+        theme:'企业AI落地',
+        hint:'考察候选人能否区分「技术指标好」和「业务结果好」的不一致，深挖NPS下降原因（如AI回答冷漠、无法转人工、回答不准确等）。'
+      },
+      {
+        title:'客户是一家中型银行，希望用AI替代目前60%的信贷审核人工流程，但监管要求所有信贷决策必须「可解释」。你作为方案设计顾问，如何在效率、准确率和合规之间找到平衡？',
+        theme:'顾问服务方案设计',
+        hint:'考察对「可解释AI（XAI）」的基本认知、监管合规意识，以及在多约束条件下的方案取舍能力。'
+      }
     ]
   }
 ];
 
 const topicsEl = document.getElementById('topics');
-topics.forEach((t,i)=>{
-  const el = document.createElement('div');
-  el.className = 'topic-card';
-  el.innerHTML = `
-    <div class="topic-head" onclick="toggleTopic(${i})">
-      <div class="topic-num">${t.n}</div>
-      <div class="topic-ttl">${t.title}</div>
-      <div class="topic-meta">${t.tags.map(tg=>`<span class="tag">${tg}</span>`).join('')}</div>
-      <div class="topic-arrow" id="ta${i}">▾</div>
-    </div>
-    <div class="topic-body" id="tb${i}">
-      <div class="topic-desc">${t.desc}</div>
-      <ul class="topic-pts">${t.pts.map(p=>`<li>${p}</li>`).join('')}</ul>
-    </div>`;
-  topicsEl.appendChild(el);
+let topicIdx = 0;
+topicLevels.forEach(level => {
+  // Level header
+  const hdr = document.createElement('div');
+  hdr.style.cssText = `display:flex;align-items:center;gap:10px;margin:18px 0 10px;padding:10px 16px;background:${level.bg};border-radius:10px;border-left:4px solid ${level.color}`;
+  hdr.innerHTML = `<span style="font-size:15px;font-weight:800;color:${level.color}">${level.level}</span><span style="font-size:13px;color:#6b7280">${level.desc}</span>`;
+  topicsEl.appendChild(hdr);
+
+  level.items.forEach(t => {
+    const i = topicIdx++;
+    const el = document.createElement('div');
+    el.className = 'topic-card';
+    el.style.borderLeftColor = level.color;
+    el.innerHTML = `
+      <div class="topic-head" onclick="toggleTopic(${i})">
+        <div class="topic-num" style="background:${level.color}">${i+1}</div>
+        <div class="topic-ttl">${t.title}</div>
+        <div class="topic-meta"><span class="tag tag-red">${t.theme}</span></div>
+        <div class="topic-arrow" id="ta${i}" style="color:${level.color}">▾</div>
+      </div>
+      <div class="topic-body" id="tb${i}">
+        <div class="topic-desc" style="margin-top:12px">💡 <strong>考察要点：</strong>${t.hint}</div>
+      </div>`;
+    topicsEl.appendChild(el);
+  });
 });
 
 function toggleTopic(i){
